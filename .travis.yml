@@ -9,6 +9,8 @@ env:
     - COVERAGE=0 XDEBUG=0
 
 php:
+  - 5.3
+  - 5.4
   - 5.5
   - 5.6
   - 7.0
@@ -18,11 +20,30 @@ php:
   - hhvm-3.18
 
 matrix:
+  include:
+    - php: hhvm-3.18
+      sudo: required
+      dist: trusty
+      env: LARAVEL='5.4.*' XDEBUG=1
+    - php: 5.3
+      env: COVERAGE=1 XDEBUG=1
+    - php: 7.0
+      env: COVERAGE=1 XDEBUG=1
+    - php: 7.1
+      env: COVERAGE=1 XDEBUG=1
+    - php: 7.2
+      env: COVERAGE=1 XDEBUG=1
   fast_finish: true
   allow_failures:
     - php: 7.0
     - php: 7.1
     - php: 7.2
+
+before_install:
+  - if [[ $XDEBUG = 0 ]]; then phpenv config-rm xdebug.ini; fi
+
+install:
+  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
 
 before_script:
   - travis_retry composer self-update
@@ -30,3 +51,6 @@ before_script:
 
 script:
   - vendor/bin/phpunit --verbose
+
+after_success:
+  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi

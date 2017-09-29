@@ -1,3 +1,6 @@
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648/small.png)](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648)
+[![Build Status](https://travis-ci.org/odenktools/php-bca.svg?branch=master)](https://travis-ci.org/odenktools/php-bca)
+
 # BCA (Bank Central Asia)
 
 Native PHP library untuk keperluan BCA REST API
