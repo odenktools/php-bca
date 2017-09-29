@@ -8,18 +8,25 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 
 ## Fitur Library
 
-* [Setting](https://github.com/odenktools/php-bca#setting-dan-constructor)
+* [Installasi](https://github.com/odenktools/php-bca#instalasi)
+* [Setting](https://github.com/odenktools/php-bca#koneksi-dan-setting)
 * [Login](https://github.com/odenktools/php-bca#login)
 * [Informasi Saldo](https://github.com/odenktools/php-bca#balance-information)
 * [Transfer](https://github.com/odenktools/php-bca#fund-transfer)
 * [Mutasi Rekening](https://github.com/odenktools/php-bca#account-statement)
 * [Info Kurs](https://github.com/odenktools/php-bca#foreign-exchange-rate)
 * [Pencarian ATM Terdekat](https://github.com/odenktools/php-bca#nearest-atm-locator)
-* more...
+* More ...
 
-# EXAMPLES
+### INSTALASI
 
-## SETTING DAN CONSTRUCTOR
+```bash
+composer require "odenktools/php-bca"
+```
+
+### KONEKSI DAN SETTING
+
+Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID, CLIENT_KEY, CLIENT_SECRET, APIKEY, SECRETKEY``` telah diketahui.
 
 ```php
     $options = array(
@@ -35,7 +42,7 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 	// Setting default timezone Anda
 	BcaHttp::setTimeZone('Asia/Jakarta');
 
-	//Or
+	//or
 	//BcaHttp::setTimeZone('Asia/Singapore');
 
 	$corp_id = "BCAAPI2016";
@@ -54,7 +61,7 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 ### LOGIN
 
 ```php
-	$corp_id = "BCAAPI2016";
+	$corp_id = "CORP_ID-ANDA";
 	$client_key = "NILAI-CLIENT-KEY-ANDA";
 	$client_secret = "NILAI-CLIENT-SECRET-ANDA";
 	$apikey = "NILAI-APIKEY-ANDA";
@@ -69,7 +76,11 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 	echo json_encode($response);
 ```
 
+Setelah Login berhasil pastikan anda menyimpan nilai ```TOKEN``` di tempat yang aman, karena nilai ```TOKEN``` tersebut agar digunakan untuk tugas tugas berikutnya.
+
 ### BALANCE INFORMATION
+
+Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
 	// Nilai token yang dihasilkan saat login
@@ -86,6 +97,8 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 ```
 
 ### FUND TRANSFER
+
+Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
 	// Nilai token yang dihasilkan saat login
@@ -118,6 +131,8 @@ Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank 
 ```
 
 ### ACCOUNT STATEMENT
+
+Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
 	// Nilai token yang dihasilkan saat login

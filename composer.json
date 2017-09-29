@@ -13,7 +13,7 @@
   }],
   "require": {
     "php": ">=5.2",
-	"ext-curl": "*",
+    "ext-curl": "*",
     "mashape/unirest-php": "3.0.4",
     "nesbot/carbon": "~1.18"
   },
@@ -27,5 +27,9 @@
     "sort-packages": true
   },
   "prefer-stable": true,
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "scripts": {
+    "test": "phpunit --colors=always",
+    "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=.codecov.yml"
+  }
 }
