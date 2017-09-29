@@ -1,5 +1,3 @@
-*.DS_Store
-test/config.php
 vendor
 .php_cs.cache
 composer.lock

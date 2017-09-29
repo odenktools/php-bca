@@ -20,6 +20,9 @@ Native PHP library untuk keperluan BCA REST API
 	// Setting default timezone Anda
 	BcaHttp::setTimeZone('Asia/Jakarta');
 
+	//Or
+	//BcaHttp::setTimeZone('Asia/Singapore');
+
 	$corp_id = "BCAAPI2016";
 	$client_key = "NILAI-CLIENT-KEY-ANDA";
 	$client_secret = "NILAI-CLIENT-SECRET-ANDA";

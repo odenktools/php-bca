@@ -1,43 +1,5 @@
 <?php
 
-class BcaHttpException extends Exception
-{
-}
-
-class BcaHttpInstance
-{
-    private static $instance      = null;
-    private static $corp_id       = '';
-    private static $client_id     = '';
-    private static $client_secret = '';
-    private static $api_key       = '';
-    private static $secret_key    = '';
-
-    private function __construct()
-    {
-    }
-
-    private function __clone()
-    {
-    }
-
-    public static function get_bca()
-    {
-        if (self::$instance !== null) {
-            return self::$instance;
-        }
-
-        self::$instance = new BcaHttp(
-            self::$corp_id,
-            self::$client_id,
-            self::$client_secret,
-            self::$api_key,
-            self::$secret_key
-        );
-        return self::$instance;
-    }
-}
-
 /**
  * BCA REST API Library.
  *
@@ -49,7 +11,7 @@ class BcaHttp
 {
     public static $VERSION = '1.0.0';
 
-    private $logger = null;
+    private static $timezone = 'Asia/Jakarta';
 
     private $settings = array(
         'corp_id'       => '',
@@ -59,11 +21,11 @@ class BcaHttp
         'secret_key'    => '',
         'scheme'        => 'https',
         'port'          => 443,
-        'host'          => 'sandbox.bca.co.id',
         'timezone'      => 'Asia/Jakarta',
+        'host'          => 'sandbox.bca.co.id',
         'timeout'       => 30,
         'debug'         => true,
-        'development'   => true
+        'development'   => true,
     );
 
     /**
@@ -203,7 +165,7 @@ class BcaHttp
         }
 
         if ($timeZone == '') {
-            $timeZone = $this->settings['timezone'];
+            $timeZone = self::getTimeZone();
         }
 
         $apikey = $this->settings['api_key'];
@@ -219,7 +181,7 @@ class BcaHttp
         }
 
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
-        $isoTime       = self::generateIsoTime($timeZone);
+        $isoTime       = self::generateIsoTime();
         $emptyArray    = array();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
 
@@ -285,7 +247,7 @@ class BcaHttp
         $this->validateOauthSecret($secret);
 
         $uriSign    = "POST:/banking/corporates/transfers";
-        $isoTime    = self::generateIsoTime($timeZone);
+        $isoTime    = self::generateIsoTime();
         $emptyArray = array();
 
         $headers                    = array();
@@ -367,7 +329,7 @@ class BcaHttp
      */
     public static function setTimeZone($timeZone)
     {
-        $this->settings['timezone'] = $timeZone;
+        self::$timezone = $timeZone;
     }
 
     /**
@@ -377,9 +339,9 @@ class BcaHttp
      *
      * @return string
      */
-    public static function getTimeZone($timeZone)
+    public static function getTimeZone()
     {
-        return $this->settings['timezone'];
+        return self::$timezone;
     }
 
     /**
@@ -389,10 +351,10 @@ class BcaHttp
      *
      * @return string
      */
-    public static function generateIsoTime($timeZone = "Asia/Jakarta")
+    public static function generateIsoTime()
     {
-        $date = \Carbon\Carbon::now($timeZone);
-        date_default_timezone_set($timeZone);
+        $date = \Carbon\Carbon::now(self::getTimeZone());
+        date_default_timezone_set(self::getTimeZone());
         $fmt     = $date->format('Y-m-d\TH:i:s');
         $ISO8601 = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
 
