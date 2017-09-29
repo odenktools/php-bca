@@ -272,7 +272,7 @@ class BcaHttp
         $params['Radius']    = $radius;
         ksort($params);
 
-        $auth_query_string = self::array_implode('=', '&', $params);
+        $auth_query_string = self::arrayImplode('=', '&', $params);
 
         $uriSign       = "GET:/general/info-bca/atm?$auth_query_string";
         $isoTime       = self::generateIsoTime();
@@ -513,7 +513,7 @@ class BcaHttp
      *
      * @return string The imploded array
      */
-    public static function array_implode($glue, $separator, $array)
+    public static function arrayImplode($glue, $separator, $array)
     {
         if (!is_array($array)) {
             return $array;
