@@ -3,11 +3,23 @@
 
 # BCA (Bank Central Asia)
 
-Native PHP library untuk keperluan BCA REST API
+Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank Central Asia). Untuk dokumentasi lebih jelas dan lengkap, silahkan kunjungi website resminya di [Developer BCA](https://developer.bca.co.id/documentation)
+
+
+## Fitur Library
+
+* [Setting](https://github.com/odenktools/php-bca#setting-dan-constructor)
+* [Login](https://github.com/odenktools/php-bca#login)
+* [Informasi Saldo](https://github.com/odenktools/php-bca#balance-information)
+* [Transfer](https://github.com/odenktools/php-bca#fund-transfer)
+* [Mutasi Rekening](https://github.com/odenktools/php-bca#account-statement)
+* [Info Kurs](https://github.com/odenktools/php-bca#foreign-exchange-rate)
+* [Pencarian ATM Terdekat](https://github.com/odenktools/php-bca#nearest-atm-locator)
+* more...
 
 # EXAMPLES
 
-### SETTING DAN CONSTRUCTOR
+## SETTING DAN CONSTRUCTOR
 
 ```php
     $options = array(
@@ -39,7 +51,7 @@ Native PHP library untuk keperluan BCA REST API
 	$bca = new BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
 ```
 
-### LOGIN KE BCA
+### LOGIN
 
 ```php
 	$corp_id = "BCAAPI2016";
@@ -121,6 +133,19 @@ Native PHP library untuk keperluan BCA REST API
 	$enddate = '2016-09-01';
 
 	$response = $bca->getAccountStatement($token, $nomorakun, $startdate, $enddate);
+
+	echo json_encode($response);
+```
+
+### FOREIGN EXCHANGE RATE
+
+```php
+	//Tipe rate :  bn, e-rate, tt, tc
+	$rateType = 'e-rate';
+
+	$mataUang = 'usd';
+
+	$response = $bca->getForexRate($token, $rateType, $mataUang);
 
 	echo json_encode($response);
 ```
