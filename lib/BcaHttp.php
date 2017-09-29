@@ -241,7 +241,6 @@ class BcaHttp
 
         $uriSign    = "POST:/banking/corporates/transfers";
         $isoTime    = self::generateIsoTime();
-        $emptyArray = array();
 
         $headers                    = array();
         $headers['Accept']          = 'application/json';

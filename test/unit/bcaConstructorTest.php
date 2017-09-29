@@ -8,33 +8,41 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testClientIdParameter()
     {
-        $client_id = 'JDjdkudfsidsfsddjfkdfj';
-        $bca       = new BcaHttp('corpid', $client_id, 'client_secret', 'apikey', 'secret');
-        $settings  = $bca->getSettings();
-        $this->assertEquals(true, $settings['client_id']);
+        $client_id = 'IodfipdifdsfiOAPPOOO';
+        $equal     = 'IodfipdifdsfiOAPPOOO';
+
+        $bca      = new BcaHttp('corpid', $client_id, 'client_secret', 'apikey', 'secret');
+        $settings = $bca->getSettings();
+        $this->assertEquals($equal, $settings['client_id']);
     }
 
     public function testClientSecretParameter()
     {
-        $client_secret = '78dfs78s7df8sdjfksduJJjdsjj';
-        $bca           = new BcaHttp('corpid', 'client_id', $client_secret, 'apikey', 'secret');
-        $settings      = $bca->getSettings();
-        $this->assertEquals(true, $settings['client_secret']);
+        $client_secret = 'YUydsfkhsdfhkuYUYh';
+        $equal         = 'YUydsfkhsdfhkuYUYh';
+
+        $bca      = new BcaHttp('corpid', 'client_id', $client_secret, 'apikey', 'secret');
+        $settings = $bca->getSettings();
+        $this->assertEquals($equal, $settings['client_secret']);
     }
 
     public function testApiKeyParameter()
     {
-        $api_key  = '78dfs78s7df8sdjfksduJJjdsjj';
+        $api_key = 'ofisdifoisfoioOIOIOdfsl';
+        $equal   = 'ofisdifoisfoioOIOIOdfsl';
+
         $bca      = new BcaHttp('corpid', 'client_id', 'client_secret', $api_key, 'secret');
         $settings = $bca->getSettings();
-        $this->assertEquals(true, $settings['api_key']);
+        $this->assertEquals($equal, $settings['api_key']);
     }
 
     public function testSecretParameter()
     {
-        $secret   = '78dfs78s7df8sdjfksduJJjdsjj';
+        $secret = 'dfisodisofisdfoMMksdflla';
+        $equal  = 'dfisodisofisdfoMMksdflla';
+
         $bca      = new BcaHttp('corpid', 'client_id', 'client_secret', 'api_key', $secret);
         $settings = $bca->getSettings();
-        $this->assertEquals(true, $settings['secret_key']);
+        $this->assertEquals($equal, $settings['secret_key']);
     }
 }
