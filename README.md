@@ -101,9 +101,46 @@ Native PHP library untuk keperluan BCA REST API
 						'Testing Saja Ko',
 						'Online Saja Ko',
 						$nomorTransaksiID);
+
+	echo json_encode($response);
 ```
 
-... MORE ... Calm Down Beeb
+### ACCOUNT STATEMENT
+
+```php
+	// Nilai token yang dihasilkan saat login
+	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+
+	// Nilai akun bank anda
+	$nomorakun = '0201245680';
+	
+	// Tanggal start transaksi anda
+	$startdate = '2016-08-29';
+	
+	// Tanggal akhir transaksi anda
+	$enddate = '2016-09-01';
+
+	$response = $bca->getAccountStatement($token, $nomorakun, $startdate, $enddate);
+
+	echo json_encode($response);
+```
+
+### NEAREST ATM LOCATOR
+
+```php
+	$latitude = '-6.1900718';
+
+	$longitude = '106.797190';
+
+	$totalAtmShow = '10';
+
+	$radius = '20';
+
+	$response = $bca->getAtmLocation($token, $latitude, $longitude, $totalAtmShow, $radius);
+
+	echo json_encode($response);
+```
+
 
 # LICENSE
 

@@ -148,18 +148,13 @@ class BcaHttp
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
      * @param array $sourceAccountId nomor akun yang akan dicek
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
-     * @param string $bodyToHash array Body yang akan dikirimkan ke Server BCA
      *
      * @return object
      */
-    public function getBalanceInfo($oauth_token, $sourceAccountId = [], $corp_id = '', $timeZone = '')
+    public function getBalanceInfo($oauth_token, $sourceAccountId = [], $corp_id = '')
     {
         if ($corp_id == '') {
             $corp_id = $this->settings['corp_id'];
-        }
-
-        if ($timeZone == '') {
-            $timeZone = self::getTimeZone();
         }
 
         $apikey = $this->settings['api_key'];
@@ -199,6 +194,111 @@ class BcaHttp
     }
 
     /**
+     * Ambil Daftar transaksi pertanggal.
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login
+     * @param array $sourceAccount nomor akun yang akan dicek
+     * @param string $startDate tanggal awal
+     * @param string $endDate tanggal akhir
+     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
+     *
+     * @return object
+     */
+    public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate, $corp_id = '')
+    {
+        if ($corp_id == '') {
+            $corp_id = $this->settings['corp_id'];
+        }
+
+        $apikey = $this->settings['api_key'];
+        $secret = $this->settings['secret_key'];
+
+        $this->validateOauthKey($apikey);
+        $this->validateOauthSecret($secret);
+
+        $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
+        $isoTime       = self::generateIsoTime();
+        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
+
+        $headers                    = array();
+        $headers['Accept']          = 'application/json';
+        $headers['Content-Type']    = 'application/json';
+        $headers['Authorization']   = "Bearer $oauth_token";
+        $headers['X-BCA-Key']       = $apikey;
+        $headers['X-BCA-Timestamp'] = $isoTime;
+        $headers['X-BCA-Signature'] = $authSignature;
+
+        $request_path = "banking/v2/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
+        $domain       = $this->ddnDomain();
+        $full_url     = $domain . $request_path;
+
+        \Unirest\Request::verifyPeer(false);
+        $data     = array('grant_type' => 'client_credentials');
+        $body     = \Unirest\Request\Body::form($data);
+        $response = \Unirest\Request::get($full_url, $headers, $body);
+
+        return $response;
+    }
+
+    /**
+     * Ambil informasi ATM berdasarkan lokasi GEO
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login
+     * @param string $latitude Langitude GPS
+     * @param string $longitude Longitude GPS
+     * @param string $count Jumlah ATM BCA yang akan ditampilkan
+     * @param string $radius Nilai radius dari lokasi GEO
+     *
+     * @return object
+     */
+    public function getAtmLocation(
+        $oauth_token,
+        $latitude,
+        $longitude,
+        $count = '10',
+        $radius = '20'
+    ) {
+        $apikey = $this->settings['api_key'];
+        $secret = $this->settings['secret_key'];
+
+        $this->validateOauthKey($apikey);
+        $this->validateOauthSecret($secret);
+
+        $params              = array();
+        $params['SearchBy']  = 'Distance';
+        $params['Latitude']  = $latitude;
+        $params['Longitude'] = $longitude;
+        $params['Count']     = $count;
+        $params['Radius']    = $radius;
+        ksort($params);
+
+        $auth_query_string = self::array_implode('=', '&', $params);
+
+        $uriSign       = "GET:/general/info-bca/atm?$auth_query_string";
+        $isoTime       = self::generateIsoTime();
+        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
+
+        $headers                    = array();
+        $headers['Accept']          = 'application/json';
+        $headers['Content-Type']    = 'application/json';
+        $headers['Authorization']   = "Bearer $oauth_token";
+        $headers['X-BCA-Key']       = $apikey;
+        $headers['X-BCA-Timestamp'] = $isoTime;
+        $headers['X-BCA-Signature'] = $authSignature;
+
+        $request_path = "general/info-bca/atm?SearchBy=Distance&Latitude=$latitude&Longitude=$longitude&Count=$count&Radius=$radius";
+        $domain       = $this->ddnDomain();
+        $full_url     = $domain . $request_path;
+
+        \Unirest\Request::verifyPeer(false);
+        $data     = array('grant_type' => 'client_credentials');
+        $body     = \Unirest\Request\Body::form($data);
+        $response = \Unirest\Request::get($full_url, $headers, $body);
+
+        return $response;
+    }
+
+    /**
      * Transfer dana kepada akun lain dengan jumlah nominal tertentu.
      *
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
@@ -222,15 +322,10 @@ class BcaHttp
         $remark1,
         $remark2,
         $transactionID,
-        $corp_id = '',
-        $timeZone = ''
+        $corp_id = ''
     ) {
         if ($corp_id == '') {
             $corp_id = $this->settings['corp_id'];
-        }
-
-        if ($timeZone == '') {
-            $timeZone = $this->settings['timezone'];
         }
 
         $apikey = $this->settings['api_key'];
@@ -239,8 +334,8 @@ class BcaHttp
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
 
-        $uriSign    = "POST:/banking/corporates/transfers";
-        $isoTime    = self::generateIsoTime();
+        $uriSign = "POST:/banking/corporates/transfers";
+        $isoTime = self::generateIsoTime();
 
         $headers                    = array();
         $headers['Accept']          = 'application/json';
@@ -301,7 +396,7 @@ class BcaHttp
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
         } else {
-            $hash  = hash("sha256", "");
+            $hash = hash("sha256", "");
         }
 
         $stringToSign   = $url . ":" . $auth_token . ":" . $hash . ":" . $isoTime;
@@ -405,5 +500,32 @@ class BcaHttp
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
             throw new BcaHttpException('Invalid OauthSecret' . $id);
         }
+    }
+
+    /**
+     * Implode an array with the key and value pair giving
+     * a glue, a separator between pairs and the array
+     * to implode.
+     *
+     * @param string $glue      The glue between key and value
+     * @param string $separator Separator between pairs
+     * @param array  $array     The array to implode
+     *
+     * @return string The imploded array
+     */
+    public static function array_implode($glue, $separator, $array)
+    {
+        if (!is_array($array)) {
+            return $array;
+        }
+        $string = array();
+        foreach ($array as $key => $val) {
+            if (is_array($val)) {
+                $val = implode(',', $val);
+            }
+            $string[] = "{$key}{$glue}{$val}";
+        }
+
+        return implode($separator, $string);
     }
 }
