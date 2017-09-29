@@ -13,6 +13,7 @@
   }],
   "require": {
     "php": ">=5.2",
+	"ext-curl": "*",
     "mashape/unirest-php": "3.0.4",
     "nesbot/carbon": "~1.18"
   },

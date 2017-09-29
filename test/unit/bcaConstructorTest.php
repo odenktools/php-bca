@@ -9,7 +9,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     public function testClientIdParameter()
     {
         $client_id = 'JDjdkudfsidsfsddjfkdfj';
-        $bca       = new BcaHttp('corpid', $client_key, 'client_secret', 'apikey', 'secret');
+        $bca       = new BcaHttp('corpid', $client_id, 'client_secret', 'apikey', 'secret');
         $settings  = $bca->getSettings();
         $this->assertEquals(true, $settings['client_id']);
     }
@@ -17,8 +17,24 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     public function testClientSecretParameter()
     {
         $client_secret = '78dfs78s7df8sdjfksduJJjdsjj';
-        $bca           = new BcaHttp('corpid', 'client_key', $client_secret, 'apikey', 'secret');
+        $bca           = new BcaHttp('corpid', 'client_id', $client_secret, 'apikey', 'secret');
         $settings      = $bca->getSettings();
         $this->assertEquals(true, $settings['client_secret']);
+    }
+
+    public function testApiKeyParameter()
+    {
+        $api_key  = '78dfs78s7df8sdjfksduJJjdsjj';
+        $bca      = new BcaHttp('corpid', 'client_id', 'client_secret', $api_key, 'secret');
+        $settings = $bca->getSettings();
+        $this->assertEquals(true, $settings['api_key']);
+    }
+
+    public function testSecretParameter()
+    {
+        $secret   = '78dfs78s7df8sdjfksduJJjdsjj';
+        $bca      = new BcaHttp('corpid', 'client_id', 'client_secret', 'api_key', $secret);
+        $settings = $bca->getSettings();
+        $this->assertEquals(true, $settings['secret_key']);
     }
 }

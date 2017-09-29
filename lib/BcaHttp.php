@@ -29,12 +29,6 @@ class BcaHttp
     );
 
     /**
-     * Curl handler
-     * @var object
-     */
-    private $ch = null;
-
-    /**
      * @var string
      */
     protected $error;
@@ -44,7 +38,7 @@ class BcaHttp
      *
      * @throws BcaHttpException if any required dependencies are missing
      */
-    private function check_compatibility()
+    private function compatibility()
     {
         if (!extension_loaded('curl') || !extension_loaded('json')) {
             throw new BcaHttpException('CURL tidak terinstall pada PHP anda.');
@@ -57,6 +51,8 @@ class BcaHttp
 
     public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
+        $this->compatibility();
+
         if (!isset($options['host'])) {
             $options['host'] = 'sandbox.bca.co.id';
         }
@@ -111,7 +107,7 @@ class BcaHttp
      * port = 80 ? 443
      * @return string
      */
-    private function ddn_domain()
+    private function ddnDomain()
     {
         return $this->settings['scheme'] . '://' . $this->settings['host'] . ':' . $this->settings['port'] . '/';
     }
@@ -125,19 +121,17 @@ class BcaHttp
      */
     public function httpAuth()
     {
-        $corp_id       = $this->settings['corp_id'];
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
 
         $this->validateClientKey($client_id);
         $this->validateClientSecret($client_secret);
 
-        $result      = array('token' => null, 'code' => 401);
         $headerToken = base64_encode("$client_id:$client_secret");
         $headers     = array('Accept' => 'application/json', 'Authorization' => "Basic $headerToken");
 
         $request_path = "api/oauth/token";
-        $domain       = $this->ddn_domain();
+        $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
         $data = array('grant_type' => 'client_credentials');
@@ -182,7 +176,6 @@ class BcaHttp
 
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $isoTime       = self::generateIsoTime();
-        $emptyArray    = array();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
 
         $headers                    = array();
@@ -194,7 +187,7 @@ class BcaHttp
         $headers['X-BCA-Signature'] = $authSignature;
 
         $request_path = "banking/v2/corporates/$corp_id/accounts/$arraySplit";
-        $domain       = $this->ddn_domain();
+        $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
         \Unirest\Request::verifyPeer(false);
@@ -258,7 +251,7 @@ class BcaHttp
         $headers['X-BCA-Timestamp'] = $isoTime;
 
         $request_path = "banking/corporates/transfers";
-        $domain       = $this->ddn_domain();
+        $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
         $bodyData                             = array();
@@ -284,7 +277,6 @@ class BcaHttp
         $headers['X-BCA-Signature'] = $authSignature;
 
         \Unirest\Request::verifyPeer(false);
-        $data     = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($encoderData);
         $response = \Unirest\Request::post($full_url, $headers, $body);
 
@@ -310,7 +302,6 @@ class BcaHttp
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
         } else {
-            $empty = "";
             $hash  = hash("sha256", "");
         }
 
@@ -415,21 +406,5 @@ class BcaHttp
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
             throw new BcaHttpException('Invalid OauthSecret' . $id);
         }
-    }
-
-    public static function array_implode($glue, $separator, $array)
-    {
-        if (!is_array($array)) {
-            return $array;
-        }
-        $string = array();
-        foreach ($array as $key => $val) {
-            if (is_array($val)) {
-                $val = implode(',', $val);
-            }
-            $string[] = "{$key}{$glue}{$val}";
-        }
-
-        return implode($separator, $string);
     }
 }
