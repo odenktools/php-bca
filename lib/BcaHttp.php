@@ -1,9 +1,5 @@
 <?php
 
-use Carbon\Carbon;
-use Exception;
-use Unirest;
-
 class BcaHttpException extends Exception
 {
 }
@@ -14,6 +10,8 @@ class BcaHttpInstance
     private static $corp_id       = '';
     private static $client_id     = '';
     private static $client_secret = '';
+    private static $api_key       = '';
+    private static $secret_key    = '';
 
     private function __construct()
     {
@@ -32,12 +30,21 @@ class BcaHttpInstance
         self::$instance = new BcaHttp(
             self::$corp_id,
             self::$client_id,
-            self::$client_secret
+            self::$client_secret,
+            self::$api_key,
+            self::$secret_key
         );
         return self::$instance;
     }
 }
 
+/**
+ * BCA REST API Library.
+ *
+ * @author     Pribumi Technology
+ * @license    MIT
+ * @copyright  (c) 2017, Pribumi Technology
+ */
 class BcaHttp
 {
     public static $VERSION = '1.0.0';
@@ -48,13 +55,15 @@ class BcaHttp
         'corp_id'       => '',
         'client_id'     => '',
         'client_secret' => '',
+        'api_key'       => '',
+        'secret_key'    => '',
         'scheme'        => 'https',
         'port'          => 443,
         'host'          => 'sandbox.bca.co.id',
+        'timezone'      => 'Asia/Jakarta',
         'timeout'       => 30,
         'debug'         => true,
-        'development'   => true,
-        'curl_options'  => array(),
+        'development'   => true
     );
 
     /**
@@ -84,7 +93,7 @@ class BcaHttp
         }
     }
 
-    public function __construct($corp_id, $client_id, $client_secret, $options = array())
+    public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
         if (!isset($options['host'])) {
             $options['host'] = 'sandbox.bca.co.id';
@@ -94,8 +103,11 @@ class BcaHttp
             $options['port'] = 443;
         }
 
+        if (!isset($options['timezone'])) {
+            $options['timezone'] = 'Asia/Jakarta';
+        }
+
         foreach ($options as $key => $value) {
-            // only set if valid setting/option
             if (isset($this->settings[$key])) {
                 $this->settings[$key] = $value;
             }
@@ -104,6 +116,8 @@ class BcaHttp
         $this->settings['corp_id']       = $corp_id;
         $this->settings['client_id']     = $client_id;
         $this->settings['client_secret'] = $client_secret;
+        $this->settings['api_key']       = $api_key;
+        $this->settings['secret_key']    = $secret_key;
 
         if (!array_key_exists('host', $this->settings)) {
             if (array_key_exists('host', $options)) {
@@ -118,7 +132,7 @@ class BcaHttp
     }
 
     /**
-     * Fetch the settings.
+     * Ambil Nilai settings.
      *
      * @return array
      */
@@ -133,22 +147,21 @@ class BcaHttp
      * scheme = http(s)
      * host = sandbox.bca.co.id
      * port = 80 ? 443
-     * prefix = '/api/v1'
      * @return string
      */
     private function ddn_domain()
     {
-        return $this->settings['scheme'] . '://' . $this->settings['host'] . ':' . $this->settings['port'];
+        return $this->settings['scheme'] . '://' . $this->settings['host'] . ':' . $this->settings['port'] . '/';
     }
 
     /**
      * Generate authentifikasi ke server berupa OAUTH
      *
-     * @param bool $data
+     * @param array $data
      *
-     * @return array
+     * @return object
      */
-    public function httpAuth($data = [])
+    public function httpAuth()
     {
         $corp_id       = $this->settings['corp_id'];
         $client_id     = $this->settings['client_id'];
@@ -165,29 +178,39 @@ class BcaHttp
         $domain       = $this->ddn_domain();
         $full_url     = $domain . $request_path;
 
+        $data = array('grant_type' => 'client_credentials');
         $body = \Unirest\Request\Body::form($data);
-        Unirest\Request::verifyPeer(false);
-        $response = Unirest\Request::post($full_url, $headers, $body);
-        if ($response->code === 200) {
-            $result['body']         = $response->body;
-            $result['access_token'] = $response->body->access_token;
-            $result['code']         = 200;
-        }
+        \Unirest\Request::verifyPeer(false);
+        $response = \Unirest\Request::post($full_url, $headers, $body);
 
-        return $result;
+        return $response;
     }
 
-    public function getBalanceInfo($oauth_token, $sourceAccountId = [], $corp_id = '', $gmt = "+07:00")
+    /**
+     * Ambil informasi saldo berdasarkan nomor akun BCA.
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login
+     * @param array $sourceAccountId nomor akun yang akan dicek
+     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
+     * @param string $bodyToHash array Body yang akan dikirimkan ke Server BCA
+     *
+     * @return object
+     */
+    public function getBalanceInfo($oauth_token, $sourceAccountId = [], $corp_id = '', $timeZone = '')
     {
         if ($corp_id == '') {
             $corp_id = $this->settings['corp_id'];
         }
 
-        $client_id     = $this->settings['client_id'];
-        $client_secret = $this->settings['client_secret'];
+        if ($timeZone == '') {
+            $timeZone = $this->settings['timezone'];
+        }
 
-        $this->validateClientKey($client_id);
-        $this->validateClientSecret($client_secret);
+        $apikey = $this->settings['api_key'];
+        $secret = $this->settings['secret_key'];
+
+        $this->validateOauthKey($apikey);
+        $this->validateOauthSecret($secret);
 
         if (!empty($sourceAccountId)) {
             $arraySplit = implode(",", $sourceAccountId);
@@ -196,26 +219,112 @@ class BcaHttp
         }
 
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
-        $isoTime       = self::generateIsoTime();
+        $isoTime       = self::generateIsoTime($timeZone);
         $emptyArray    = array();
-        $authSignature = $this->generateSign($uriSign, $oauth_token, $client_secret, $isoTime, $emptyArray);
+        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
 
         $headers                    = array();
         $headers['Accept']          = 'application/json';
         $headers['Content-Type']    = 'application/json';
         $headers['Authorization']   = "Bearer $oauth_token";
-        $headers['X-BCA-Key']       = $client_id;
+        $headers['X-BCA-Key']       = $apikey;
         $headers['X-BCA-Timestamp'] = $isoTime;
         $headers['X-BCA-Signature'] = $authSignature;
-        $data                       = array('grant_type' => 'client_credentials');
 
         $request_path = "banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $domain       = $this->ddn_domain();
         $full_url     = $domain . $request_path;
 
         \Unirest\Request::verifyPeer(false);
+        $data     = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
+
+        return $response;
+    }
+
+    /**
+     * Transfer dana kepada akun lain dengan jumlah nominal tertentu.
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login
+     * @param int $amount nilai dana dalam RUPIAH yang akan ditransfer, Format: 13.2
+     * @param string $beneficiaryAccountNumber  BCA Account number to be credited (Destination)
+     * @param string $referenceID Sender's transaction reference ID
+     * @param string $remark1 Transfer remark for receiver
+     * @param string $remark2 ransfer remark for receiver
+     * @param string $sourceAccountNumber Source of Fund Account Number
+     * @param string $transactionID Transcation ID unique per day (using UTC+07 Time Zone). Format: Number
+     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA [Optional]
+     *
+     * @return object
+     */
+    public function fundTransfers(
+        $oauth_token,
+        $amount,
+        $sourceAccountNumber,
+        $beneficiaryAccountNumber,
+        $referenceID,
+        $remark1,
+        $remark2,
+        $transactionID,
+        $corp_id = '',
+        $timeZone = ''
+    ) {
+        if ($corp_id == '') {
+            $corp_id = $this->settings['corp_id'];
+        }
+
+        if ($timeZone == '') {
+            $timeZone = $this->settings['timezone'];
+        }
+
+        $apikey = $this->settings['api_key'];
+        $secret = $this->settings['secret_key'];
+
+        $this->validateOauthKey($apikey);
+        $this->validateOauthSecret($secret);
+
+        $uriSign    = "POST:/banking/corporates/transfers";
+        $isoTime    = self::generateIsoTime($timeZone);
+        $emptyArray = array();
+
+        $headers                    = array();
+        $headers['Accept']          = 'application/json';
+        $headers['Content-Type']    = 'application/json';
+        $headers['Authorization']   = "Bearer $oauth_token";
+        $headers['X-BCA-Key']       = $apikey;
+        $headers['X-BCA-Timestamp'] = $isoTime;
+
+        $request_path = "banking/corporates/transfers";
+        $domain       = $this->ddn_domain();
+        $full_url     = $domain . $request_path;
+
+        $bodyData                             = array();
+        $bodyData['Amount']                   = $amount;
+        $bodyData['BeneficiaryAccountNumber'] = $beneficiaryAccountNumber;
+        $bodyData['CorporateID']              = $corp_id;
+        $bodyData['CurrencyCode']             = 'IDR';
+        $bodyData['ReferenceID']              = $referenceID;
+        $bodyData['Remark1']                  = strtolower(str_replace(' ', '', $remark1));
+        $bodyData['Remark2']                  = strtolower(str_replace(' ', '', $remark2));
+        $bodyData['SourceAccountNumber']      = $sourceAccountNumber;
+        $bodyData['TransactionDate']          = $isoTime;
+        $bodyData['TransactionID']            = $transactionID;
+
+        // Harus disort agar mudah kalkulasi HMAC
+        ksort($bodyData);
+
+        // Supaya jgn strip "ReferenceID" "/" jadi "/\" karena HMAC akan menjadi tidak cocok
+        $encoderData = json_encode($bodyData, JSON_UNESCAPED_SLASHES);
+
+        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, $bodyData);
+
+        $headers['X-BCA-Signature'] = $authSignature;
+
+        \Unirest\Request::verifyPeer(false);
+        $data     = array('grant_type' => 'client_credentials');
+        $body     = \Unirest\Request\Body::form($encoderData);
+        $response = \Unirest\Request::post($full_url, $headers, $body);
 
         return $response;
     }
@@ -234,13 +343,13 @@ class BcaHttp
     public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash = [])
     {
         $hash = null;
-        if (!empty($bodyToHash)) {
+        if (!empty($bodyToHash) || $bodyToHash !== null) {
             ksort($bodyToHash);
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
         } else {
             $empty = "";
-            $hash  = hash("sha256", $empty);
+            $hash  = hash("sha256", "");
         }
 
         $stringToSign   = $url . ":" . $auth_token . ":" . $hash . ":" . $isoTime;
@@ -249,6 +358,37 @@ class BcaHttp
         return $auth_signature;
     }
 
+    /**
+     * Generate ISO8601 Time.
+     *
+     * @param string $timeZone Time yang akan dipergunakan
+     *
+     * @return string
+     */
+    public static function setTimeZone($timeZone)
+    {
+        $this->settings['timezone'] = $timeZone;
+    }
+
+    /**
+     * Generate ISO8601 Time.
+     *
+     * @param string $timeZone Time yang akan dipergunakan
+     *
+     * @return string
+     */
+    public static function getTimeZone($timeZone)
+    {
+        return $this->settings['timezone'];
+    }
+
+    /**
+     * Generate ISO8601 Time.
+     *
+     * @param string $timeZone Time yang akan dipergunakan
+     *
+     * @return string
+     */
     public static function generateIsoTime($timeZone = "Asia/Jakarta")
     {
         $date = \Carbon\Carbon::now($timeZone);
@@ -259,16 +399,59 @@ class BcaHttp
         return $ISO8601;
     }
 
+    /**
+     * Validasi jika clientkey telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
     private function validateClientKey($id)
     {
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
             throw new BcaHttpException('Invalid ClientKey' . $id);
         }
     }
+
+    /**
+     * Validasi jika clientsecret telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
     private function validateClientSecret($id)
     {
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
             throw new BcaHttpException('Invalid ClientSecret' . $id);
+        }
+    }
+
+    /**
+     * Validasi jika clientsecret telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
+    private function validateOauthKey($id)
+    {
+        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
+            throw new BcaHttpException('Invalid ApiKey' . $id);
+        }
+    }
+
+    /**
+     * Validasi jika clientsecret telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
+    private function validateOauthSecret($id)
+    {
+        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
+            throw new BcaHttpException('Invalid OauthSecret' . $id);
         }
     }
 
