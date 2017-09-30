@@ -1,22 +1,20 @@
+language: php
+
 cache:
   directories:
     - $HOME/.composer/cache
-
-language: php
 
 env:
   global:
     - COVERAGE=1 XDEBUG=0
 
-php:
-  - 5.4
-  - 5.5
-  - 5.6
-  - hhvm
-  - hhvm-3.18
-
 matrix:
   include:
+    - php: 5.4
+    - php: 5.5
+    - php: 5.6
+    - php: hhvm
+      env: XDEBUG=1   
     - php: 7.0
       env: COVERAGE=1 XDEBUG=1
     - php: 7.1
@@ -29,15 +27,12 @@ matrix:
     - php: 7.1
     - php: 7.2
 
-install:
-  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
-
 before_script:
   - travis_retry composer self-update
-  - travis_retry composer install --no-interaction --prefer-source
+  - travis_retry composer install --no-interaction --prefer-source --dev
 
 script:
-  - vendor/bin/phpunit --verbose --coverage-clover=.codecov.yml
+  - vendor/bin/phpunit --coverage-clover=.codecov.yml
 
 after_success:
-  - if [[ $COVERAGE = 1 ]]; then bash <(curl -s https://codecov.io/bash); fi
+  bash <(curl -s https://codecov.io/bash)
