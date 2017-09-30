@@ -35,4 +35,4 @@ script:
   - vendor/bin/phpunit --coverage-clover=.codecov.yml
 
 after_success:
-  bash <(curl -s https://codecov.io/bash)
+  bash <(curl -s https://codecov.io/bash) -t 37766e58-c910-44fa-9f32-49cd9eaa8d45
