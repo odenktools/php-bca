@@ -155,13 +155,20 @@ class BcaHttp
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
         
-        $this->validateOauthKey($corp_id);
+        $this->validateCorpId($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
         $this->validateArray($sourceAccountId);
 
-        $arraySplit = implode(",", $sourceAccountId);
-        
+		ksort($sourceAccountId);
+
+		if(count($sourceAccountId) <= 20){
+			$arraySplit = implode(",", $sourceAccountId);
+			$arraySplit = urlencode($arraySplit);
+		}else{
+			throw new BcaHttpException('Maksimal Account Number ' . 20);
+		}
+
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $isoTime       = self::generateIsoTime();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
@@ -205,7 +212,7 @@ class BcaHttp
 
         $secret = $this->settings['secret_key'];
         
-        $this->validateOauthKey($corp_id);
+        $this->validateCorpId($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
 
@@ -374,7 +381,7 @@ class BcaHttp
         $apikey = $this->settings['api_key'];
         $secret = $this->settings['secret_key'];
 
-        $this->validateOauthKey($corp_id);
+        $this->validateCorpId($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
 
@@ -490,6 +497,21 @@ class BcaHttp
 
         return $ISO8601;
     }
+
+    /**
+     * Validasi jika clientkey telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
+    private function validateCorpId($id)
+    {
+        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
+            throw new BcaHttpException('Invalid CorpId' . $id);
+        }
+    }
+
     /**
      * Validasi jika clientkey telah di-definsikan.
      *

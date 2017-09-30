@@ -90,9 +90,8 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 	// Nilai token yang dihasilkan saat login
 	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
 
-	//Nomor akun yang akan di ambil informasi saldonya
-	//Saat ini hanya bisa satu nomor aku saja
-	$arrayAccNumber = array('0063001004');
+	//Nomor akun yang akan di ambil informasi saldonya, menggunakan ARRAY
+	$arrayAccNumber = array('0201245680', '0063001004', '1111111111');
 
 	$response = $bca->getBalanceInfo($token, $arrayAccNumber);
 	
