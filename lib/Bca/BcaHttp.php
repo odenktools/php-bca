@@ -118,8 +118,6 @@ class BcaHttp
      */
     public function httpAuth()
     {
-        $settings = $this->getSettings();
-        
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
 
@@ -153,8 +151,6 @@ class BcaHttp
      */
     public function getBalanceInfo($oauth_token, $sourceAccountId = [])
     {
-        $settings = $this->getSettings();
-
         $corp_id = $this->settings['corp_id'];
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
@@ -203,8 +199,6 @@ class BcaHttp
      */
     public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate)
     {
-        $settings = $this->getSettings();
-
         $corp_id = $this->settings['corp_id'];
         
         $apikey = $this->settings['api_key'];
@@ -257,8 +251,6 @@ class BcaHttp
         $count = '10',
         $radius = '20'
     ) {
-        $settings = $this->getSettings();
-        
         $apikey = $this->settings['api_key'];
         
         $secret = $this->settings['secret_key'];
@@ -314,8 +306,6 @@ class BcaHttp
         $rateType = 'e-rate',
         $currency = 'USD'
     ) {
-        $settings = $this->getSettings();
-        
         $apikey = $this->settings['api_key'];
         
         $secret = $this->settings['secret_key'];
@@ -380,8 +370,6 @@ class BcaHttp
         $transactionID,
         $corp_id = ''
     ) {
-        $settings = $this->getSettings();
-
         $corp_id = $this->settings['corp_id'];
         $apikey = $this->settings['api_key'];
         $secret = $this->settings['secret_key'];
