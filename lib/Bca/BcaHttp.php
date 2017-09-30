@@ -121,8 +121,8 @@ class BcaHttp
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
 
-        $this->validateOauthKey($client_id);
-        $this->validateOauthSecret($client_secret);
+        $this->validateClientKey($client_id);
+        $this->validateClientSecret($client_secret);
         
         $headerToken = base64_encode("$client_id:$client_secret");
 
