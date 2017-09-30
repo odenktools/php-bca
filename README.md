@@ -41,10 +41,11 @@ Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID
     );
 
 	// Setting default timezone Anda
-	BcaHttp::setTimeZone('Asia/Jakarta');
+	\Bca\BcaHttp::setTimeZone('Asia/Jakarta');
 
-	//or
-	//BcaHttp::setTimeZone('Asia/Singapore');
+	// ATAU
+	
+	// \Bca\BcaHttp::setTimeZone('Asia/Singapore');
 
 	$corp_id = "BCAAPI2016";
 	$client_key = "NILAI-CLIENT-KEY-ANDA";
@@ -52,11 +53,11 @@ Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID
 	$apikey = "NILAI-APIKEY-ANDA";
 	$secret = "SECRETKEY-ANDA";
 
-	$bca = new BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
+	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
 
-	//or
+	// ATAU
 
-	$bca = new BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
+	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
 ```
 
 ### LOGIN
@@ -68,7 +69,7 @@ Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID
 	$apikey = "NILAI-APIKEY-ANDA";
 	$secret = "SECRETKEY-ANDA";
 
-	$bca = new BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
+	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
 
 	// Request Login dan dapatkan nilai OAUTH
 	$response = $bca->httpAuth();

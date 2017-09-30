@@ -1,5 +1,7 @@
 <?php
 
+namespace Bca;
+
 class BcaHttpInstance
 {
     private static $instance      = null;

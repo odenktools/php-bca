@@ -1,5 +1,7 @@
 <?php
 
+namespace Bca;
+
 /**
  * BCA REST API Library.
  *
@@ -13,7 +15,7 @@ class BcaHttp
 
     private static $timezone = 'Asia/Jakarta';
 
-    private $settings = array(
+    protected $settings = array(
         'corp_id'       => '',
         'client_id'     => '',
         'client_secret' => '',
@@ -24,7 +26,6 @@ class BcaHttp
         'timezone'      => 'Asia/Jakarta',
         'host'          => 'sandbox.bca.co.id',
         'timeout'       => 30,
-        'debug'         => true,
         'development'   => true,
     );
 
@@ -33,9 +34,9 @@ class BcaHttp
      *
      * @throws BcaHttpException if any required dependencies are missing
      */
-    private function compatibility()
+    private function checkCompatibility()
     {
-        if (!extension_loaded('curl') || !extension_loaded('json')) {
+        if (!extension_loaded('curl')) {
             throw new BcaHttpException('CURL tidak terinstall pada PHP anda.');
         }
 
@@ -46,13 +47,13 @@ class BcaHttp
 
     public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
-        $this->compatibility();
+        $this->checkCompatibility();
 
         if (!isset($options['host'])) {
             $options['host'] = 'sandbox.bca.co.id';
         }
 
-        if (!isset($options['host'])) {
+        if (!isset($options['port'])) {
             $options['port'] = 443;
         }
 
@@ -65,13 +66,7 @@ class BcaHttp
                 $this->settings[$key] = $value;
             }
         }
-
-        $this->settings['corp_id']       = $corp_id;
-        $this->settings['client_id']     = $client_id;
-        $this->settings['client_secret'] = $client_secret;
-        $this->settings['api_key']       = $api_key;
-        $this->settings['secret_key']    = $secret_key;
-
+        
         if (!array_key_exists('host', $this->settings)) {
             if (array_key_exists('host', $options)) {
                 $this->settings['host'] = $options['host'];
@@ -79,7 +74,13 @@ class BcaHttp
                 $this->settings['host'] = 'sandbox.bca.co.id';
             }
         }
-
+        
+        $this->settings['corp_id']       = $corp_id;
+        $this->settings['client_id']     = $client_id;
+        $this->settings['client_secret'] = $client_secret;
+        $this->settings['api_key']       = $api_key;
+        $this->settings['secret_key']    = $secret_key;
+        
         $this->settings['host'] =
             preg_replace('/http[s]?\:\/\//', '', $this->settings['host'], 1);
     }
@@ -117,14 +118,17 @@ class BcaHttp
      */
     public function httpAuth()
     {
+        $settings = $this->getSettings();
+        
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
 
-        $this->validateClientKey($client_id);
-        $this->validateClientSecret($client_secret);
-
+        $this->validateOauthKey($client_id);
+        $this->validateOauthSecret($client_secret);
+        
         $headerToken = base64_encode("$client_id:$client_secret");
-        $headers     = array('Accept' => 'application/json', 'Authorization' => "Basic $headerToken");
+
+        $headers = array('Accept' => 'application/json', 'Authorization' => "Basic $headerToken");
 
         $request_path = "api/oauth/token";
         $domain       = $this->ddnDomain();
@@ -147,24 +151,21 @@ class BcaHttp
      *
      * @return object
      */
-    public function getBalanceInfo($oauth_token, $sourceAccountId = [], $corp_id = '')
+    public function getBalanceInfo($oauth_token, $sourceAccountId = [])
     {
-        if ($corp_id == '') {
-            $corp_id = $this->settings['corp_id'];
-        }
+        $settings = $this->getSettings();
 
-        $apikey = $this->settings['api_key'];
-        $secret = $this->settings['secret_key'];
-
+        $corp_id = $this->settings['corp_id'];
+        $apikey  = $this->settings['api_key'];
+        $secret  = $this->settings['secret_key'];
+        
+        $this->validateOauthKey($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
+        $this->validateArray($sourceAccountId);
 
-        if (!empty($sourceAccountId)) {
-            $arraySplit = implode(",", $sourceAccountId);
-        } else {
-            throw new BcaHttpException('AccountNumber tidak boleh kosong.');
-        }
-
+        $arraySplit = implode(",", $sourceAccountId);
+        
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $isoTime       = self::generateIsoTime();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
@@ -200,15 +201,17 @@ class BcaHttp
      *
      * @return object
      */
-    public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate, $corp_id = '')
+    public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate)
     {
-        if ($corp_id == '') {
-            $corp_id = $this->settings['corp_id'];
-        }
+        $settings = $this->getSettings();
 
+        $corp_id = $this->settings['corp_id'];
+        
         $apikey = $this->settings['api_key'];
-        $secret = $this->settings['secret_key'];
 
+        $secret = $this->settings['secret_key'];
+        
+        $this->validateOauthKey($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
 
@@ -254,12 +257,15 @@ class BcaHttp
         $count = '10',
         $radius = '20'
     ) {
+        $settings = $this->getSettings();
+        
         $apikey = $this->settings['api_key'];
+        
         $secret = $this->settings['secret_key'];
-
+        
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
-
+        
         $params              = array();
         $params['SearchBy']  = 'Distance';
         $params['Latitude']  = $latitude;
@@ -308,12 +314,15 @@ class BcaHttp
         $rateType = 'e-rate',
         $currency = 'USD'
     ) {
+        $settings = $this->getSettings();
+        
         $apikey = $this->settings['api_key'];
+        
         $secret = $this->settings['secret_key'];
-
+        
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
-
+        
         $params             = array();
         $params['RateType'] = strtolower($rateType);
         $params['Currency'] = strtoupper($currency);
@@ -371,17 +380,18 @@ class BcaHttp
         $transactionID,
         $corp_id = ''
     ) {
-        if ($corp_id == '') {
-            $corp_id = $this->settings['corp_id'];
-        }
+        $settings = $this->getSettings();
 
+        $corp_id = $this->settings['corp_id'];
         $apikey = $this->settings['api_key'];
         $secret = $this->settings['secret_key'];
 
+        $this->validateOauthKey($corp_id);
         $this->validateOauthKey($apikey);
         $this->validateOauthSecret($secret);
 
         $uriSign = "POST:/banking/corporates/transfers";
+        
         $isoTime = self::generateIsoTime();
 
         $headers                    = array();
@@ -492,7 +502,6 @@ class BcaHttp
 
         return $ISO8601;
     }
-
     /**
      * Validasi jika clientkey telah di-definsikan.
      *
@@ -548,7 +557,21 @@ class BcaHttp
             throw new BcaHttpException('Invalid OauthSecret' . $id);
         }
     }
-
+    
+    /**
+     * Validasi jika clientsecret telah di-definsikan.
+     *
+     * @param string clientkey
+     *
+     * @return string
+     */
+    private function validateArray($sourceAccountId)
+    {
+        if (empty($sourceAccountId)) {
+            throw new BcaHttpException('AccountNumber tidak boleh kosong.');
+        }
+    }
+    
     /**
      * Implode an array with the key and value pair giving
      * a glue, a separator between pairs and the array

@@ -21,7 +21,9 @@
     "phpunit/phpunit": "~4"
   },
   "autoload": {
-    "classmap": ["lib/"]
+    "psr-0": {
+      "Bca\\": "lib/"
+    }  
   },
   "config": {
     "sort-packages": true
