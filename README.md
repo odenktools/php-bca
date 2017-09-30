@@ -1,5 +1,6 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648/small.png)](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648)
 [![Build Status](https://travis-ci.org/odenktools/php-bca.svg?branch=master)](https://travis-ci.org/odenktools/php-bca)
+[![codecov](https://codecov.io/gh/odenktools/php-bca/branch/master/graph/badge.svg)](https://codecov.io/gh/odenktools/php-bca)
 
 # BCA (Bank Central Asia)
 
@@ -181,6 +182,13 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 	echo json_encode($response);
 ```
 
+# TESTING
+
+Untuk melakukan testing lakukan ```command``` berikut ini
+
+```bash
+composer run-script test
+```
 
 # LICENSE
 
