@@ -30,6 +30,6 @@
   "minimum-stability": "dev",
   "scripts": {
     "test": "phpunit --colors=always",
-    "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=.codecov.yml"
+    "test:ci": "composer test -- --verbose --coverage-text --coverage-clover=coverage.xml"
   }
 }
