@@ -45,4 +45,38 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $settings = $bca->getSettings();
         $this->assertEquals($equal, $settings['secret_key']);
     }
+
+    public function testTimeZone()
+    {
+        BcaHttp::setTimeZone('Asia/Singapore');
+        $timezone = BcaHttp::getTimeZone();
+
+        $this->assertEquals($timezone,
+            'Asia/Singapore');
+    }
+
+    public function testAuth()
+    {
+        $bca      = new BcaHttp('corpid', 'client_id', 'client_secret', 'api_key', 'secret');
+        $response = $bca->httpAuth();
+        $this->assertEquals($response->code, 400);
+    }
+
+    public function testFund()
+    {
+        $bca = new BcaHttp('corpid', 'client_id', 'client_secret', 'api_key', 'secret');
+
+        $token = "o7d8qCgfsHwRneFGTHdQsFcS5Obmd26O10iBFRi50Ve8Yb06Ju5xx";
+
+        $response = $bca->fundTransfers($token,
+            '50000.00',
+            '0201245680',
+            '0201245681',
+            '12345/PO/2017',
+            'Testing Saja Ko',
+            'Online Saja Ko',
+            '00000001');
+
+        $this->assertEquals($response->code, 400);
+    }
 }
