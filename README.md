@@ -6,8 +6,9 @@
 
 # BCA (Bank Central Asia)
 
-Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank Central Asia). Untuk dokumentasi lebih jelas dan lengkap, silahkan kunjungi website resminya di [Developer BCA](https://developer.bca.co.id/documentation)
+Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank Central Asia). Untuk dokumentasi lebih jelas dan lengkap, silahkan kunjungi website resminya di [Developer BCA](https://developer.bca.co.id/documentation).
 
+Untuk Framework ```Laravel``` bisa menggunakan library [Odenktools Laravel BCA](https://github.com/odenktools/laravel-bca).
 
 ## Fitur Library
 
