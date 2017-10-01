@@ -163,4 +163,12 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $response       = $bca->getBalanceInfo($token, $arrayAccNumber);
         $this->assertEquals($response->code, 400);
     }
+
+    public function testGetDepositRate()
+    {
+        $token          = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
+        $bca            = new \Bca\BcaHttp('corp_id', 'client_id', 'client_secret', 'api_key', 'secret');
+        $response       = $bca->getDepositRate($token);
+        $this->assertEquals($response->code, 400);
+    }
 }

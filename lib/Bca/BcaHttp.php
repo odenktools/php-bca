@@ -374,8 +374,7 @@ class BcaHttp
         $referenceID,
         $remark1,
         $remark2,
-        $transactionID,
-        $corp_id = ''
+        $transactionID
     ) {
         $corp_id = $this->settings['corp_id'];
         $apikey = $this->settings['api_key'];
@@ -428,7 +427,48 @@ class BcaHttp
 
         return $response;
     }
+	
+    /**
+     * Realtime deposit untuk produk BCA.
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login
+     *
+     * @return object
+     */
+    public function getDepositRate($oauth_token)
+    {
+        $corp_id = $this->settings['corp_id'];
+        $apikey  = $this->settings['api_key'];
+        $secret  = $this->settings['secret_key'];
+        
+        $this->validateCorpId($corp_id);
+        $this->validateOauthKey($apikey);
+        $this->validateOauthSecret($secret);
 
+        $uriSign       = "GET:/general/rate/deposit";
+        $isoTime       = self::generateIsoTime();
+        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
+
+        $headers                    = array();
+        $headers['Accept']          = 'application/json';
+        $headers['Content-Type']    = 'application/json';
+        $headers['Authorization']   = "Bearer $oauth_token";
+        $headers['X-BCA-Key']       = $apikey;
+        $headers['X-BCA-Timestamp'] = $isoTime;
+        $headers['X-BCA-Signature'] = $authSignature;
+
+        $request_path = "general/rate/deposit";
+        $domain       = $this->ddnDomain();
+        $full_url     = $domain . $request_path;
+
+        \Unirest\Request::verifyPeer(false);
+        $data     = array('grant_type' => 'client_credentials');
+        $body     = \Unirest\Request\Body::form($data);
+        $response = \Unirest\Request::get($full_url, $headers, $body);
+
+        return $response;
+    }
+	
     /**
      * Generate Signature.
      *

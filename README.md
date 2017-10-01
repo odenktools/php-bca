@@ -20,7 +20,7 @@ Untuk Framework ```Laravel``` bisa menggunakan library [Odenktools Laravel BCA](
 * [Mutasi Rekening](https://github.com/odenktools/php-bca#account-statement)
 * [Info Kurs](https://github.com/odenktools/php-bca#foreign-exchange-rate)
 * [Pencarian ATM Terdekat](https://github.com/odenktools/php-bca#nearest-atm-locator)
-* More ...
+* [Deposit Rate](https://github.com/odenktools/php-bca#deposit-rate)
 
 ### INSTALASI
 
@@ -181,6 +181,19 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 	$radius = '20';
 
 	$response = $bca->getAtmLocation($token, $latitude, $longitude, $totalAtmShow, $radius);
+
+	echo json_encode($response);
+```
+
+### DEPOSIT RATE
+
+Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
+
+```php
+	// Nilai token yang dihasilkan saat login
+	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+
+	$response       = $bca->getDepositRate($token);
 
 	echo json_encode($response);
 ```
