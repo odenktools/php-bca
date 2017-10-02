@@ -15,6 +15,7 @@
          stopOnFailure="false"
          verbose="true">
   <testsuites>
+
     <testsuite name="all">
       <directory>./test/</directory>
     </testsuite>
@@ -23,6 +24,16 @@
       <directory>./test/unit/</directory>
     </testsuite>
   </testsuites>
+
+  <filter>
+	<whitelist>
+		<directory suffix=".php">lib/Bca</directory>
+        <exclude>
+			<file>lib/Bca/BcaHttpException.php</file>
+			<file>lib/Bca/BcaHttpInstance.php</file>
+      </exclude>
+	</whitelist>
+  </filter>
 
   <logging>
 	<log type="tap" target="build/report.tap"/>

@@ -24,35 +24,13 @@ class BcaHttp
         'scheme'        => 'https',
         'port'          => 443,
         'timezone'      => 'Asia/Jakarta',
-        'host'          => 'sandbox.bca.co.id',
         'timeout'       => 30,
         'development'   => true,
     );
 
-    /**
-     * Cek compability extensi CURL di PHP.
-     *
-     * @throws BcaHttpException if any required dependencies are missing
-     */
-    private function checkCompatibility()
-    {
-        if (!extension_loaded('curl')) {
-            throw new BcaHttpException('CURL tidak terinstall pada PHP anda.');
-        }
-
-        if (!in_array('sha256', hash_algos())) {
-            throw new BcaHttpException('SHA256 tidak support pada versi PHP anda, Silahkan upgrade versi PHP anda.');
-        }
-    }
 
     public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
-        $this->checkCompatibility();
-
-        if (!isset($options['host'])) {
-            $options['host'] = 'sandbox.bca.co.id';
-        }
-
         if (!isset($options['port'])) {
             $options['port'] = 443;
         }
@@ -66,7 +44,7 @@ class BcaHttp
                 $this->settings[$key] = $value;
             }
         }
-        
+
         if (!array_key_exists('host', $this->settings)) {
             if (array_key_exists('host', $options)) {
                 $this->settings['host'] = $options['host'];
@@ -74,7 +52,7 @@ class BcaHttp
                 $this->settings['host'] = 'sandbox.bca.co.id';
             }
         }
-        
+
         $this->settings['corp_id']       = $corp_id;
         $this->settings['client_id']     = $client_id;
         $this->settings['client_secret'] = $client_secret;
@@ -121,8 +99,8 @@ class BcaHttp
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
 
-        $this->validateClientKey($client_id);
-        $this->validateClientSecret($client_secret);
+        $this->validateBcaKey($client_id);
+        $this->validateBcaKey($client_secret);
         
         $headerToken = base64_encode("$client_id:$client_secret");
 
@@ -156,18 +134,13 @@ class BcaHttp
         $secret  = $this->settings['secret_key'];
         
         $this->validateCorpId($corp_id);
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
         $this->validateArray($sourceAccountId);
 
-		ksort($sourceAccountId);
-
-		if(count($sourceAccountId) <= 20){
-			$arraySplit = implode(",", $sourceAccountId);
-			$arraySplit = urlencode($arraySplit);
-		}else{
-			throw new BcaHttpException('Maksimal Account Number ' . 20);
-		}
+        ksort($sourceAccountId);
+        $arraySplit = implode(",", $sourceAccountId);
+        $arraySplit = urlencode($arraySplit);
 
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $isoTime       = self::generateIsoTime();
@@ -213,8 +186,8 @@ class BcaHttp
         $secret = $this->settings['secret_key'];
         
         $this->validateCorpId($corp_id);
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
 
         $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $isoTime       = self::generateIsoTime();
@@ -262,8 +235,8 @@ class BcaHttp
         
         $secret = $this->settings['secret_key'];
         
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
         
         $params              = array();
         $params['SearchBy']  = 'Distance';
@@ -317,8 +290,8 @@ class BcaHttp
         
         $secret = $this->settings['secret_key'];
         
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
         
         $params             = array();
         $params['RateType'] = strtolower($rateType);
@@ -381,8 +354,8 @@ class BcaHttp
         $secret = $this->settings['secret_key'];
 
         $this->validateCorpId($corp_id);
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
 
         $uriSign = "POST:/banking/corporates/transfers";
         
@@ -427,7 +400,7 @@ class BcaHttp
 
         return $response;
     }
-	
+    
     /**
      * Realtime deposit untuk produk BCA.
      *
@@ -442,8 +415,8 @@ class BcaHttp
         $secret  = $this->settings['secret_key'];
         
         $this->validateCorpId($corp_id);
-        $this->validateOauthKey($apikey);
-        $this->validateOauthSecret($secret);
+        $this->validateBcaKey($apikey);
+        $this->validateBcaKey($secret);
 
         $uriSign       = "GET:/general/rate/deposit";
         $isoTime       = self::generateIsoTime();
@@ -468,7 +441,7 @@ class BcaHttp
 
         return $response;
     }
-	
+    
     /**
      * Generate Signature.
      *
@@ -539,45 +512,36 @@ class BcaHttp
     }
 
     /**
-     * Validasi jika clientkey telah di-definsikan.
+     * Validasi CORP_ID yang telah diberikan pihahk BCA.
      *
-     * @param string clientkey
+     * @param string $corpId
      *
      * @return string
      */
-    private function validateCorpId($id)
+    private function validateCorpId($corpId)
     {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
-            throw new BcaHttpException('Invalid CorpId' . $id);
+        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $corpId)) {
+            throw new BcaHttpException('Invalid CorpId' . $corpId);
         }
+
+        return true;
     }
 
     /**
-     * Validasi jika clientkey telah di-definsikan.
+     * Validasi Key yang telah BCA tentukan.
+     * Format 1234567-1234-1234-1345-123456789123
      *
-     * @param string clientkey
+     * @param string $key
      *
-     * @return string
+     * @return bool
      */
-    private function validateClientKey($id)
+    private function validateBcaKey($key)
     {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
-            throw new BcaHttpException('Invalid ClientKey' . $id);
+        if (!preg_match('/\A([-a-zA-Z0-9]{7})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{12})+\z/', $key)) {
+            throw new BcaHttpException('Format `Key` tidak valid' . $key);
         }
-    }
 
-    /**
-     * Validasi jika clientsecret telah di-definsikan.
-     *
-     * @param string clientkey
-     *
-     * @return string
-     */
-    private function validateClientSecret($id)
-    {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
-            throw new BcaHttpException('Invalid ClientSecret' . $id);
-        }
+        return true;
     }
 
     /**
@@ -585,41 +549,19 @@ class BcaHttp
      *
      * @param string clientkey
      *
-     * @return string
-     */
-    private function validateOauthKey($id)
-    {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
-            throw new BcaHttpException('Invalid ApiKey' . $id);
-        }
-    }
-
-    /**
-     * Validasi jika clientsecret telah di-definsikan.
-     *
-     * @param string clientkey
-     *
-     * @return string
-     */
-    private function validateOauthSecret($id)
-    {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $id)) {
-            throw new BcaHttpException('Invalid OauthSecret' . $id);
-        }
-    }
-    
-    /**
-     * Validasi jika clientsecret telah di-definsikan.
-     *
-     * @param string clientkey
-     *
-     * @return string
+     * @return bool
      */
     private function validateArray($sourceAccountId)
     {
         if (empty($sourceAccountId)) {
             throw new BcaHttpException('AccountNumber tidak boleh kosong.');
+        } else {
+            if (count($sourceAccountId) > 20) {
+                throw new BcaHttpException('Maksimal Account Number ' . 20);
+            }
         }
+
+        return true;
     }
     
     /**
@@ -636,7 +578,7 @@ class BcaHttp
     public static function arrayImplode($glue, $separator, $array)
     {
         if (!is_array($array)) {
-            return $array;
+            throw new BcaHttpException('Data harus array.');
         }
         $string = array();
         foreach ($array as $key => $val) {
