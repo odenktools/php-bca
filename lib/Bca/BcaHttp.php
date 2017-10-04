@@ -557,7 +557,7 @@ class BcaHttp
      *
      * @param string $corpId
      *
-     * @return string
+     * @return bool
      */
     private function validateCorpId($corpId)
     {
