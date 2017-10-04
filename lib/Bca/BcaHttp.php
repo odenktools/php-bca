@@ -492,14 +492,14 @@ class BcaHttp
      * @param string $auth_token string nilai token dari login
      * @param string $secret_key string secretkey yang telah diberikan oleh BCA
      * @param string $isoTime string Waktu ISO8601
-     * @param array|object $bodyToHash array Body yang akan dikirimkan ke Server BCA
+     * @param array $bodyToHash array Body yang akan dikirimkan ke Server BCA
      *
      * @return string
      */
     public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash)
     {
         $hash = null;
-        if (is_array($bodyToHash) || !empty($bodyToHash)) {
+        if (is_array($bodyToHash)) {
             ksort($bodyToHash);
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
@@ -589,7 +589,7 @@ class BcaHttp
     /**
      * Validasi jika clientsecret telah di-definsikan.
      *
-     * @param string sourceAccountId
+     * @param string $sourceAccountId
      *
      * @return bool
      */
