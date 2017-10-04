@@ -6,98 +6,106 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     {
     }
 
-	public static function invokeMethod(&$object, $methodName, array $parameters = array())
-	{
-		$reflection = new \ReflectionClass(get_class($object));
-		$method = $reflection->getMethod($methodName);
-		$method->setAccessible(true);
-		
-		return $method->invokeArgs($object, $parameters);
-	}
+    public static function invokeMethod(&$object, $methodName, array $parameters = array())
+    {
+        $reflection = new \ReflectionClass(get_class($object));
+        $method = $reflection->getMethod($methodName);
+        $method->setAccessible(true);
+        
+        return $method->invokeArgs($object, $parameters);
+    }
 
 
-	
-	public function testSha256()
-	{
-		$settings = in_array('sha256', hash_algos());
-		$this->assertTrue($settings);
-	}
+    
+    public function testSha256()
+    {
+        $settings = in_array('sha256', hash_algos());
+        $this->assertTrue($settings);
+    }
 
-	public function testArrayImplode() {
-	    $params              = array();
+    public function testArrayImplode()
+    {
+        $params              = array();
         $params['SearchBy']  = 'Distance';
         $params['Latitude']  = '123991239';
         $query = \Bca\BcaHttp::arrayImplode('=', '&', $params);
-		$equal = 'SearchBy=Distance&Latitude=123991239';
-		$this->assertEquals($equal, $query);
-	}
-	
-	public function testArrayImplode2() {
-	    $params              = array();
+        $equal = 'SearchBy=Distance&Latitude=123991239';
+        $this->assertEquals($equal, $query);
+    }
+    
+    public function testArrayImplode2()
+    {
+        $params              = array();
         $params['SearchBy']  = array('Distance'=>'Hellooooo');
         $params['Latitude']  = '123991239';
         $query = \Bca\BcaHttp::arrayImplode('=', '&', $params);
-		$equal = 'SearchBy=Hellooooo&Latitude=123991239';
-		$this->assertEquals($equal, $query);
-	}
-	
-	/**
-	 *  @expectedException \Bca\BcaHttpException
-	 */
-	public function testArrayImplode3() {
-		$query = \Bca\BcaHttp::arrayImplode('=', '&', 'q');
-		$this->assertEquals('Data harus array.', $query);
-	}
-	
-	/**
-	 *  @expectedException \Bca\BcaHttpException
-	 */
-	public function testValidateArr() {
-		$bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-		$arr = array();
-		$settings = self::invokeMethod($bca, 'validateArray', array($arr));
-		$this->assertTrue($settings);
-	}
+        $equal = 'SearchBy=Hellooooo&Latitude=123991239';
+        $this->assertEquals($equal, $query);
+    }
+    
+    /**
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testArrayImplode3()
+    {
+        $query = \Bca\BcaHttp::arrayImplode('=', '&', 'q');
+        $this->assertEquals('Data harus array.', $query);
+    }
+    
+    /**
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testValidateArr()
+    {
+        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
+        $arr = array();
+        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
+        $this->assertTrue($settings);
+    }
 
-	/**
-	 *  @expectedException \Bca\BcaHttpException
-	 */
-	public function testValidateArr2() {
-		$bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-		$arr = array('1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1');
-		$settings = self::invokeMethod($bca, 'validateArray', array($arr));
-		$this->assertTrue($settings);
-	}
+    /**
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testValidateArr2()
+    {
+        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
+        $arr = array('1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1');
+        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
+        $this->assertTrue($settings);
+    }
 
-	public function testValidateArr3() {
-		$bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-		try{
-			$settings = self::invokeMethod($bca, 'validateArray', array('1'));
-			$this->assertTrue($settings);
-		}catch(\Bca\BcaHttpException $e){
-			$this->fail();
-		}
-		$this->assertTrue(TRUE);
-	}
-	
-	/**
-	 *  @expectedException \Bca\BcaHttpException
-	 */
-	public function testCorpId() {
-		$bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-		$settings = self::invokeMethod($bca, 'validateCorpId', array(''));
-		$this->assertTrue($settings);
-	}
+    public function testValidateArr3()
+    {
+        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
+        try {
+            $settings = self::invokeMethod($bca, 'validateArray', array('1'));
+            $this->assertTrue($settings);
+        } catch (\Bca\BcaHttpException $e) {
+            $this->fail();
+        }
+        $this->assertTrue(true);
+    }
+    
+    /**
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testCorpId()
+    {
+        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
+        $settings = self::invokeMethod($bca, 'validateCorpId', array(''));
+        $this->assertTrue($settings);
+    }
 
-	/**
-	 *  @expectedException \Bca\BcaHttpException
-	 */
-	public function testValidateBca() {
-		$bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-		$settings = self::invokeMethod($bca, 'validateBcaKey', array('1234567-1234-1234-1345'));
-		$this->assertTrue($settings);
-	}
-	
+    /**
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testValidateBca()
+    {
+        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
+        $settings = self::invokeMethod($bca, 'validateBcaKey', array('1234567-1234-1234-1345'));
+        $this->assertTrue($settings);
+    }
+    
     public function testClientGetHost()
     {
         $equal    = 'sandbox.bca.co.id';
@@ -124,7 +132,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $settings        = $bca->getSettings();
         $this->assertEquals($equal, $settings['host']);
     }
-	
+    
     public function testClientCorpId()
     {
         $corp_id = 'BCAAPI2016';

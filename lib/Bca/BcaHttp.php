@@ -109,10 +109,13 @@ class BcaHttp
         $request_path = "api/oauth/token";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
-
+        
+        \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $data = array('grant_type' => 'client_credentials');
         $body = \Unirest\Request\Body::form($data);
-        \Unirest\Request::verifyPeer(false);
         $response = \Unirest\Request::post($full_url, $headers, $body);
 
         return $response;
@@ -157,9 +160,13 @@ class BcaHttp
         $request_path = "banking/v2/corporates/$corp_id/accounts/$arraySplit";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
-
-        \Unirest\Request::verifyPeer(false);
+        
         $data     = array('grant_type' => 'client_credentials');
+        
+        \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -206,6 +213,9 @@ class BcaHttp
         $full_url     = $domain . $request_path;
 
         \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $data     = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -265,6 +275,9 @@ class BcaHttp
         $full_url     = $domain . $request_path;
 
         \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $data     = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -317,6 +330,9 @@ class BcaHttp
         $full_url     = $domain . $request_path;
 
         \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $data     = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -395,6 +411,9 @@ class BcaHttp
         $headers['X-BCA-Signature'] = $authSignature;
 
         \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $body     = \Unirest\Request\Body::form($encoderData);
         $response = \Unirest\Request::post($full_url, $headers, $body);
 
@@ -434,8 +453,12 @@ class BcaHttp
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
-        \Unirest\Request::verifyPeer(false);
         $data     = array('grant_type' => 'client_credentials');
+        
+        \Unirest\Request::verifyPeer(false);
+		\Unirest\Request::curlOpts(array(
+			CURLOPT_SSLVERSION => 6
+		));
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
