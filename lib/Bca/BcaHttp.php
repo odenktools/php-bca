@@ -135,7 +135,6 @@ class BcaHttp
      *
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
      * @param array $sourceAccountId nomor akun yang akan dicek
-     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
      *
      * @return \Unirest\Response
      */
@@ -589,11 +588,11 @@ class BcaHttp
     /**
      * Validasi jika clientsecret telah di-definsikan.
      *
-     * @param string $sourceAccountId
+     * @param array $sourceAccountId
      *
      * @return bool
      */
-    private function validateArray($sourceAccountId)
+    private function validateArray($sourceAccountId = [])
     {
         if (empty($sourceAccountId)) {
             throw new BcaHttpException('AccountNumber tidak boleh kosong.');
