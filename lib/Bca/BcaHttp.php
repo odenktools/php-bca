@@ -11,7 +11,7 @@ namespace Bca;
  */
 class BcaHttp
 {
-    public static $VERSION = '1.0.0';
+    public static $VERSION = '2.0.2';
 
     private static $timezone = 'Asia/Jakarta';
 
@@ -28,7 +28,16 @@ class BcaHttp
         'development'   => true,
     );
 
-
+    /**
+     * Default Constructor.
+     *
+     * @param string $corp_id nilai corp id
+     * @param string $client_id nilai client key
+     * @param string $client_secret nilai client secret
+     * @param string $api_key niali oauth key
+     * @param string $secret_key nilai oauth secret
+     * @param array $options opsi ke server bca
+     */
     public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
         if (!isset($options['port'])) {
@@ -90,9 +99,7 @@ class BcaHttp
     /**
      * Generate authentifikasi ke server berupa OAUTH.
      *
-     * @param array $data
-     *
-     * @return object
+     * @return \Unirest\Response
      */
     public function httpAuth()
     {
@@ -130,7 +137,7 @@ class BcaHttp
      * @param array $sourceAccountId nomor akun yang akan dicek
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function getBalanceInfo($oauth_token, $sourceAccountId = [])
     {
@@ -186,7 +193,7 @@ class BcaHttp
      * @param string $endDate tanggal akhir
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate)
     {
@@ -238,7 +245,7 @@ class BcaHttp
      * @param string $count Jumlah ATM BCA yang akan ditampilkan
      * @param string $radius Nilai radius dari lokasi GEO
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function getAtmLocation(
         $oauth_token,
@@ -300,7 +307,7 @@ class BcaHttp
      * @param string $rateType type rate
      * @param string $currency Mata uang
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function getForexRate(
         $oauth_token,
@@ -363,7 +370,7 @@ class BcaHttp
      * @param string $transactionID Transcation ID unique per day (using UTC+07 Time Zone). Format: Number
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA [Optional]
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function fundTransfers(
         $oauth_token,
@@ -436,7 +443,7 @@ class BcaHttp
      *
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
      *
-     * @return object
+     * @return \Unirest\Response
      */
     public function getDepositRate($oauth_token)
     {
@@ -485,21 +492,20 @@ class BcaHttp
      * @param string $auth_token string nilai token dari login
      * @param string $secret_key string secretkey yang telah diberikan oleh BCA
      * @param string $isoTime string Waktu ISO8601
-     * @param string $bodyToHash array Body yang akan dikirimkan ke Server BCA
+     * @param array|object $bodyToHash array Body yang akan dikirimkan ke Server BCA
      *
      * @return string
      */
-    public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash = [])
+    public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash)
     {
         $hash = null;
-        if (!empty($bodyToHash) || $bodyToHash !== null) {
+        if (is_array($bodyToHash) || !empty($bodyToHash)) {
             ksort($bodyToHash);
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
         } else {
             $hash = hash("sha256", "");
         }
-
         $stringToSign   = $url . ":" . $auth_token . ":" . $hash . ":" . $isoTime;
         $auth_signature = hash_hmac('sha256', $stringToSign, $secret_key, false);
 
@@ -583,7 +589,7 @@ class BcaHttp
     /**
      * Validasi jika clientsecret telah di-definsikan.
      *
-     * @param string clientkey
+     * @param string sourceAccountId
      *
      * @return bool
      */

@@ -35,7 +35,7 @@ install:
     - echo extension=php_curl.dll >> php.ini
     - echo extension=php_mbstring.dll >> php.ini
     - echo extension=php_fileinfo.dll >> php.ini
-    - echo zend_extension = php_xdebug-2.2.3-5.4-vc9.dll >> php.ini
+    - echo zend_extension=php_xdebug-2.2.3-5.4-vc9.dll >> php.ini
     - echo xdebug.remote_autostart = 1 >> php.ini
     - echo xdebug.remote_enable = 1 >> php.ini
     - echo xdebug.profiler_append = 0 >> php.ini

@@ -1,6 +1,7 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648/small.png)](https://insight.sensiolabs.com/projects/0a685157-ea99-4554-b302-9e8879d05648)
 [![Build Status](https://travis-ci.org/odenktools/php-bca.svg?branch=master)](https://travis-ci.org/odenktools/php-bca)
 [![codecov](https://codecov.io/gh/odenktools/php-bca/branch/master/graph/badge.svg)](https://codecov.io/gh/odenktools/php-bca)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odenktools/php-bca/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odenktools/php-bca/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/odenktools/php-bca/v/stable)](https://packagist.org/packages/odenktools/php-bca)
 [![Latest Unstable Version](https://poser.pugx.org/odenktools/php-bca/v/unstable)](https://packagist.org/packages/odenktools/php-bca)
 
