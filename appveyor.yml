@@ -6,7 +6,6 @@ clone_folder: c:\projects\php-bca
 environment:
     matrix:
         - PHP_DOWNLOAD_FILE: php-5.4.9-nts-Win32-VC9-x86.zip
-        - XDEBUG_DOWNLOAD_FILE: php_xdebug-2.2.3-5.4-vc9.dll
 
 skip_commits:
     message: /\[ci skip\]/
@@ -24,11 +23,11 @@ install:
     - IF EXIST c:\php (SET PHP=0) ELSE (mkdir c:\php)
     - cd c:\php
     - IF %PHP%==1 appveyor DownloadFile http://windows.php.net/downloads/releases/archives/%PHP_DOWNLOAD_FILE%
-    - IF %PHP%==1 appveyor DownloadFile https://xdebug.org/files/%XDEBUG_DOWNLOAD_FILE%
+    - IF %PHP%==1 appveyor DownloadFile https://xdebug.org/files/php_xdebug-2.2.3-5.4-vc9.dll
     - IF %PHP%==1 7z x %PHP_DOWNLOAD_FILE% -y > 7z.log
     - IF %PHP%==1 echo @php %%~dp0composer.phar %%* > composer.bat
     - appveyor DownloadFile https://getcomposer.org/composer.phar
-    - mv %XDEBUG_DOWNLOAD_FILE% ext\
+    - mv php_xdebug-2.2.3-5.4-vc9.dll ext\
     - copy php.ini-production php.ini /Y
     - echo date.timezone="UTC" >> php.ini
     - echo extension_dir=ext >> php.ini
@@ -36,7 +35,7 @@ install:
     - echo extension=php_curl.dll >> php.ini
     - echo extension=php_mbstring.dll >> php.ini
     - echo extension=php_fileinfo.dll >> php.ini
-    - echo zend_extension = %XDEBUG_DOWNLOAD_FILE% >> php.ini
+    - echo zend_extension = php_xdebug-2.2.3-5.4-vc9.dll >> php.ini
     - echo xdebug.remote_autostart = 1 >> php.ini
     - echo xdebug.remote_enable = 1 >> php.ini
     - echo xdebug.profiler_append = 0 >> php.ini
@@ -45,6 +44,7 @@ install:
     - echo xdebug.remote_cookie_expire_time = 36000 >> php.ini
     - cd c:\projects\php-bca
     - SET COMPOSER_ROOT_VERSION=dev-master
+    - composer self-update
     - composer update --no-progress --ansi
 
 test_script:
