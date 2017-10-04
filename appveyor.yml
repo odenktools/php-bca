@@ -5,7 +5,7 @@ clone_folder: c:\projects\php-bca
 
 environment:
     matrix:
-        - PHP_DOWNLOAD_FILE: php-5.3.9-nts-Win32-VC9-x86.zip
+        - PHP_DOWNLOAD_FILE: php-5.4.9-nts-Win32-VC9-x86.zip
 
 skip_commits:
     message: /\[ci skip\]/
