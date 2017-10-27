@@ -4,12 +4,15 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/odenktools/php-bca/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/odenktools/php-bca/?branch=master)
 [![Latest Stable Version](https://poser.pugx.org/odenktools/php-bca/v/stable)](https://packagist.org/packages/odenktools/php-bca)
 [![Latest Unstable Version](https://poser.pugx.org/odenktools/php-bca/v/unstable)](https://packagist.org/packages/odenktools/php-bca)
+[![Total Downloads](https://poser.pugx.org/odenktools/php-bca/downloads)](https://packagist.org/packages/odenktools/php-bca)
 
 # BCA (Bank Central Asia)
 
 Native PHP library untuk mengintegrasikan Aplikasi Anda dengan sistem BCA (Bank Central Asia). Untuk dokumentasi lebih jelas dan lengkap, silahkan kunjungi website resminya di [Developer BCA](https://developer.bca.co.id/documentation).
 
 Untuk Framework ```Laravel``` bisa menggunakan library [Odenktools Laravel BCA](https://github.com/odenktools/laravel-bca).
+
+Jika merasa terbantu dengan adanya library ini, jangan lupa untuk kasih STAR untuk library ini.
 
 ## Fitur Library
 
@@ -22,6 +25,8 @@ Untuk Framework ```Laravel``` bisa menggunakan library [Odenktools Laravel BCA](
 * [Info Kurs](https://github.com/odenktools/php-bca#foreign-exchange-rate)
 * [Pencarian ATM Terdekat](https://github.com/odenktools/php-bca#nearest-atm-locator)
 * [Deposit Rate](https://github.com/odenktools/php-bca#deposit-rate)
+* [Generate Signature](https://github.com/odenktools/php-bca#generate-signature)
+* [How to contribute](https://github.com/odenktools/php-bca#how-to-contribute)
 
 ### INSTALASI
 
@@ -199,6 +204,36 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 	echo json_encode($response);
 ```
 
+### GENERATE SIGNATURE
+
+Saat berguna untuk keperluan testing.
+
+```php
+
+	$secret = "NILAI-SECRET-ANDA";
+	
+	// Nilai token yang dihasilkan saat login
+	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+	
+	$uriSign = "GET:/general/info-bca/atm";
+	
+	//Format timestamp harus dalam ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSTZD)
+	$isoTime = "2016-02-03T10:00:00.000+07:00";
+	
+	$bodyData = array();
+	
+	//nilai body anda disini
+	$bodyData['a'] = "BLAAA-BLLLAA";
+	$bodyData['b'] = "BLEHH-BLLLAA";
+	
+	//ketentuan BCA array harus disort terlebih dahulu
+	ksort($bodyData);
+
+	$authSignature = \Bca\BcaHttp::generateSign($uriSign, $token, $secret, $isoTime, $bodyData);
+	
+	echo $authSignature;
+```
+
 # TESTING
 
 Untuk melakukan testing lakukan ```command``` berikut ini
@@ -206,6 +241,37 @@ Untuk melakukan testing lakukan ```command``` berikut ini
 ```bash
 composer run-script test
 ```
+
+# How to contribute
+
+Lakukan Fork pada repository ini.
+
+Buat feature ```branch``` dengan cara
+
+```bash
+git checkout -b my-new-feature
+```
+
+Lakukan modifikasi pada repository anda tersebut. Setelah selesai lakukan commit
+
+```bash
+git commit -am 'Menambahkan fitur xxx'
+```
+
+Lakukan ```Push``` ke branch yang telah dibuat
+
+```bash
+git push origin my-new-feature
+```
+
+Lakukan pull request ke repository ini, Selesai.
+
+## Guidelines
+
+* Koding berstandart [PSR-2 Coding Style Guide](http://www.php-fig.org/psr/psr-2/)
+* Pastikan seluruh test yang dilakukan telah pass, jika anda menambahkan fitur baru, anda diharus kan untuk membuat unit test terkait dengan fitur tersebut.
+* Pergunakan [rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing) untuk menghindari conflict dan merge kode
+* Jika anda menambahkan fitur, mungkin anda juga harus mengupdate halaman dokumentasi pada repository ini.
 
 # LICENSE
 
