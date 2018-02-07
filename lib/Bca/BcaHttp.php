@@ -153,7 +153,7 @@ class BcaHttp
         $arraySplit = implode(",", $sourceAccountId);
         $arraySplit = urlencode($arraySplit);
 
-        $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$arraySplit";
+        $uriSign       = "GET:/banking/v3/corporates/$corp_id/accounts/$arraySplit";
         $isoTime       = self::generateIsoTime();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
 
@@ -165,7 +165,7 @@ class BcaHttp
         $headers['X-BCA-Timestamp'] = $isoTime;
         $headers['X-BCA-Signature'] = $authSignature;
 
-        $request_path = "banking/v2/corporates/$corp_id/accounts/$arraySplit";
+        $request_path = "banking/v3/corporates/$corp_id/accounts/$arraySplit";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
         
@@ -206,7 +206,7 @@ class BcaHttp
         $this->validateBcaKey($apikey);
         $this->validateBcaKey($secret);
 
-        $uriSign       = "GET:/banking/v2/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
+        $uriSign       = "GET:/banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $isoTime       = self::generateIsoTime();
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, null);
 
@@ -218,7 +218,7 @@ class BcaHttp
         $headers['X-BCA-Timestamp'] = $isoTime;
         $headers['X-BCA-Signature'] = $authSignature;
 
-        $request_path = "banking/v2/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
+        $request_path = "banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
