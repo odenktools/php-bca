@@ -28,6 +28,56 @@ Jika merasa terbantu dengan adanya library ini, jangan lupa untuk kasih STAR unt
 * [Generate Signature](https://github.com/odenktools/php-bca#generate-signature)
 * [How to contribute](https://github.com/odenktools/php-bca#how-to-contribute)
 
+### TODO (NEW BCA API on December 2017)
+
+Get balance information
+
+```
+/fire/accounts/balance
+```
+
+Get beneficiary account’s information
+
+```
+/fire/accounts
+```
+
+Get status of a transaction
+
+```
+/fire/transactions
+```
+
+Transfer funds directly to beneficiary account
+
+```
+/fire/transactions/to-account
+```
+
+Transfer funds to beneficiary to be taken personally
+	
+```
+/fire/transactions/cash-transfer
+```
+
+Amend cash transfer transaction’s detail
+
+```
+/fire/transactions/cash-transfer/amend
+```
+
+Cancel cash transfer transaction
+
+```
+/fire/transactions/cash-transfer/cancel
+```
+
+Get status of payment by CompanyCode and CustomerNumber or RequestID
+
+```
+/va/payments?CompanyCode=&RequestID=
+```
+
 ### INSTALASI
 
 ```bash
@@ -244,27 +294,43 @@ composer run-script test
 
 # How to contribute
 
-Lakukan Fork pada repository ini.
 
-Buat feature ```branch``` dengan cara
+* Lakukan Fork pada GitHub
+* Tambahkan fork pada git remote anda
+
+Untuk contoh commandline nya :
 
 ```bash
-git checkout -b my-new-feature
+git remote add fork git@github.com:$USER/php-bca.git  # Tambahkan fork pada remote, $USER adalah username GitHub anda
 ```
 
-Lakukan modifikasi pada repository anda tersebut. Setelah selesai lakukan commit
+contohnya :
+
+```bash
+git remote add fork git@github.com:johndoe/php-bca.git
+```
+
+* Buat feature ```branch``` dengan cara
+
+```bash
+git checkout -b feature/my-new-feature origin/develop 
+```
+
+* Lakukan pekerjaan pada repository anda tersebut. 
+* Sebelum melakukan commit lakukan ```Reformat kode``` anda menggunakan sesuai [PSR-2 Coding Style Guide](https://github.com/odenktools/php-bca#guidelines)
+* Setelah selesai lakukan commit
 
 ```bash
 git commit -am 'Menambahkan fitur xxx'
 ```
 
-Lakukan ```Push``` ke branch yang telah dibuat
+* Lakukan ```Push``` ke branch yang telah dibuat
 
 ```bash
-git push origin my-new-feature
+git push fork feature/my-new-feature
 ```
 
-Lakukan pull request ke repository ini, Selesai.
+* Lakukan PullRequest pada GitHub, setelah pekerjaan anda akan kami review. Selesai.
 
 ## Guidelines
 

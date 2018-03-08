@@ -15,12 +15,18 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         return $method->invokeArgs($object, $parameters);
     }
 
-
-    
     public function testSha256()
     {
         $settings = in_array('sha256', hash_algos());
         $this->assertTrue($settings);
+    }
+
+    public function testCanonicalizeString()
+    {
+        $string              = 'Hello Saya Kirim ini pada tanggal \r\n 1990-05-12 ';
+        $query = \Bca\BcaHttp::canonicalizeString($string);
+        $equal = 'hellosayakiriminipadatanggal1990-05-12';
+        $this->assertEquals($equal, $query);
     }
 
     public function testArrayImplode()
