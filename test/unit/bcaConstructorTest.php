@@ -17,16 +17,8 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testSha256()
     {
-        $settings = in_array('sha256', hash_algos());
-        $this->assertTrue($settings);
-    }
-
-    public function testCanonicalizeString()
-    {
-        $string              = 'Hello Saya Kirim ini pada tanggal \r\n 1990-05-12 ';
-        $query = \Bca\BcaHttp::canonicalizeString($string);
-        $equal = 'hellosayakiriminipadatanggal1990-05-12';
-        $this->assertEquals($equal, $query);
+        $hash = in_array('sha256', hash_algos());
+        $this->assertTrue($hash);
     }
 
     public function testArrayImplode()
@@ -48,7 +40,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $equal = 'SearchBy=Hellooooo&Latitude=123991239';
         $this->assertEquals($equal, $query);
     }
-    
+
     /**
      *  @expectedException \Bca\BcaHttpException
      */
@@ -57,7 +49,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $query = \Bca\BcaHttp::arrayImplode('=', '&', 'q');
         $this->assertEquals('Data harus array.', $query);
     }
-    
+
     /**
      *  @expectedException \Bca\BcaHttpException
      */
@@ -112,7 +104,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($settings);
     }
     
-    public function testClientGetHost()
+    public function testConstructHost1()
     {
         $equal    = 'sandbox.bca.co.id';
         $bca      = new \Bca\BcaHttp('corp_id', 'client_id', 'secret', 'apikey', 'secret');
@@ -120,7 +112,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['host']);
     }
 
-    public function testClientGetOptions1()
+    public function testConstructHost2()
     {
         $options         = array();
         $options['host'] = 'xxxx.com';
@@ -130,6 +122,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['host']);
     }
 
+    /**
+     * Testing constructor host
+     */
     public function testClientGetOptions2()
     {
         $options         = array();
@@ -139,41 +134,48 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['host']);
     }
     
+    /**
+     * Testing constructor corp_id
+     */
     public function testClientCorpId()
     {
+        $options = array();
         $corp_id = 'BCAAPI2016';
         $equal   = 'BCAAPI2016';
-        $bca      = new \Bca\BcaHttp($corp_id, '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca      = new \Bca\BcaHttp($corp_id, '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $settings = $bca->getSettings();
         $this->assertEquals($equal, $settings['corp_id']);
     }
 
     public function testClientIdParameter()
     {
+        $options         = array();
         $client_id = '1234567-1234-1234-1345-123456789123';
         $equal     = '1234567-1234-1234-1345-123456789123';
 
-        $bca      = new \Bca\BcaHttp('corpid', $client_id, '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca      = new \Bca\BcaHttp('corpid', $client_id, '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $settings = $bca->getSettings();
         $this->assertEquals($equal, $settings['client_id']);
     }
 
     public function testClientSecretParameter()
     {
+        $options         = array();
         $client_secret = '1234567-1234-1234-1345-123456789123';
         $equal         = '1234567-1234-1234-1345-123456789123';
 
-        $bca      = new \Bca\BcaHttp('corpid', 'client_id', $client_secret, 'apikey', 'secret');
+        $bca      = new \Bca\BcaHttp('corpid', 'client_id', $client_secret, 'apikey', 'secret', $options);
         $settings = $bca->getSettings();
         $this->assertEquals($equal, $settings['client_secret']);
     }
 
     public function testApiKeyParameter()
     {
+        $options         = array();
         $api_key = '1234567-1234-1234-1345-123456789123';
         $equal   = '1234567-1234-1234-1345-123456789123';
 
-        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $api_key, '1234567-1234-1234-1345-123456789123');
+        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $api_key, '1234567-1234-1234-1345-123456789123', $options);
         $settings = $bca->getSettings();
         $this->assertEquals($equal, $settings['api_key']);
     }
@@ -201,14 +203,16 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testAuth()
     {
-        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $options         = array();
+        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $response = $bca->httpAuth();
         $this->assertEquals($response->code, 400);
     }
 
     public function testFund()
     {
-        $bca = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $options         = array();
+        $bca = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
 
         $token = "o7d8qCgfsHwRneFGTHdQsFcS5Obmd26O10iBFRi50Ve8Yb06Ju5xx";
 
@@ -226,8 +230,33 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->code, 400);
     }
 
+    public function testFund2()
+    {
+        $options         = array();
+        $options['host'] = 'abcdefgh.com';
+        $bca = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
+
+        $token = "o7d8qCgfsHwRneFGTHdQsFcS5Obmd26O10iBFRi50Ve8Yb06Ju5xx";
+        
+        try {
+            $response = $bca->fundTransfers(
+                $token,
+                '50000.00',
+                '0201245680',
+                '0201245681',
+                '12345/PO/2017',
+                'Testing Saja Ko',
+                'Online Saja Ko',
+                '00000001'
+            );
+        } catch (\Unirest\Exception $ex) {
+            $this->assertEquals($ex->getMessage(), 'Failed to connect to abcdefgh.com port 443: Timed out');
+        }
+    }
+    
     public function testGenerateSign()
     {
+        $options        = array();
         $token          = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
         $arrayAccNumber = array('0063001004');
         $arraySplit     = implode(",", $arrayAccNumber);
@@ -242,8 +271,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testAtmLocation()
     {
+        $options = array();
         $token = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
-        $bca   = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca   = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
 
         $token = "o7d8qCgfsHwRneFGTHdQsFcS5Obmd26O10iBFRi50Ve8Yb06Ju5xx";
 
@@ -254,8 +284,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testGetForex()
     {
+        $options = array();
         $token    = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
-        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $response = $bca->getForexRate($token, 'bn', 'usd');
 
         $this->assertEquals($response->code, 400);
@@ -263,16 +294,18 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testGetAccountStatement()
     {
+        $options = array();
         $token    = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
-        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca      = new \Bca\BcaHttp('corpid', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $response = $bca->getAccountStatement($token, '0201245680', '2016-08-29', '2016-09-01');
         $this->assertEquals($response->code, 400);
     }
 
     public function testGetBalanceInfos()
     {
+        $options = array();
         $token          = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
-        $bca            = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca            = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $arrayAccNumber = array('0063001004');
         $response       = $bca->getBalanceInfo($token, $arrayAccNumber);
         $this->assertEquals($response->code, 400);
@@ -280,8 +313,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
     public function testGetDepositRate()
     {
+        $options = array();
         $token          = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
-        $bca            = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123');
+        $bca            = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $response       = $bca->getDepositRate($token);
         $this->assertEquals($response->code, 400);
     }
