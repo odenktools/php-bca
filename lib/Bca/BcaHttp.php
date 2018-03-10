@@ -11,9 +11,13 @@ namespace Bca;
  */
 class BcaHttp
 {
-    public static $VERSION = '2.0.2';
+    public static $VERSION = '2.1.0';
 
     private static $timezone = 'Asia/Jakarta';
+
+    private static $port = 443;
+
+    private static $hostName = 'sandbox.bca.co.id';
 
     protected $settings = array(
         'corp_id'       => '',
@@ -24,7 +28,7 @@ class BcaHttp
         'scheme'        => 'https',
         'port'          => 443,
         'timezone'      => 'Asia/Jakarta',
-        'timeout'       => 30,
+        'timeout'       => null,
         'development'   => true,
     );
 
@@ -41,11 +45,11 @@ class BcaHttp
     public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
     {
         if (!isset($options['port'])) {
-            $options['port'] = 443;
+            $options['port'] = self::getPort();
         }
 
         if (!isset($options['timezone'])) {
-            $options['timezone'] = 'Asia/Jakarta';
+            $options['timezone'] = self::getTimeZone();
         }
 
         foreach ($options as $key => $value) {
@@ -58,7 +62,7 @@ class BcaHttp
             if (array_key_exists('host', $options)) {
                 $this->settings['host'] = $options['host'];
             } else {
-                $this->settings['host'] = 'sandbox.bca.co.id';
+                $this->settings['host'] = self::getHostName();
             }
         }
 
@@ -120,9 +124,10 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-        
+
         $data = array('grant_type' => 'client_credentials');
         $body = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::post($full_url, $headers, $body);
@@ -170,13 +175,14 @@ class BcaHttp
         $full_url     = $domain . $request_path;
         
         $data     = array('grant_type' => 'client_credentials');
-        
+
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-        
+
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -225,7 +231,8 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
         $data     = array('grant_type' => 'client_credentials');
@@ -289,7 +296,8 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
         $data     = array('grant_type' => 'client_credentials');
@@ -346,7 +354,8 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
         $data     = array('grant_type' => 'client_credentials');
@@ -429,7 +438,8 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         $body     = \Unirest\Request\Body::form($encoderData);
         $response = \Unirest\Request::post($full_url, $headers, $body);
@@ -475,7 +485,8 @@ class BcaHttp
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
         $body     = \Unirest\Request\Body::form($data);
@@ -512,9 +523,9 @@ class BcaHttp
     }
 
     /**
-     * Generate ISO8601 Time.
+     * Set TimeZone.
      *
-     * @param string $timeZone Time yang akan dipergunakan
+     * @param string $timeZone Time yang akan dipergunakan.
      *
      * @return string
      */
@@ -524,15 +535,57 @@ class BcaHttp
     }
 
     /**
-     * Generate ISO8601 Time.
-     *
-     * @param string $timeZone Time yang akan dipergunakan
+     * Get TimeZone.
      *
      * @return string
      */
     public static function getTimeZone()
     {
         return self::$timezone;
+    }
+
+    /**
+     * Set nama domain BCA yang akan dipergunakan.
+     *
+     * @param string $hostName nama domain BCA yang akan dipergunakan.
+     *
+     * @return string
+     */
+    public static function setHostName($hostName)
+    {
+        self::$hostName = $hostName;
+    }
+
+    /**
+     * Ambil nama domain BCA yang akan dipergunakan.
+     *
+     * @return string
+     */
+    public static function getHostName()
+    {
+        return self::$hostName;
+    }
+
+    /**
+     * Set BCA port
+     *
+     * @param int $port Port yang akan dipergunakan
+     *
+     * @return int
+     */
+    public static function setPort($port)
+    {
+        self::$port = $port;
+    }
+
+    /**
+     * Get BCA port
+     *
+     * @return int
+     */
+    public static function getPort()
+    {
+        return self::$port;
     }
 
     /**
