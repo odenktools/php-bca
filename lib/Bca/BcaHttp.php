@@ -11,7 +11,7 @@ namespace Bca;
  */
 class BcaHttp
 {
-    public static $VERSION = '2.1.0';
+    public static $VERSION = '2.1.2';
 
     private static $timezone = 'Asia/Jakarta';
 
@@ -174,7 +174,7 @@ class BcaHttp
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
         
-        $data     = array('grant_type' => 'client_credentials');
+        $data = array('grant_type' => 'client_credentials');
 
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
@@ -235,7 +235,7 @@ class BcaHttp
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
-        $data     = array('grant_type' => 'client_credentials');
+        $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -300,7 +300,7 @@ class BcaHttp
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
-        $data     = array('grant_type' => 'client_credentials');
+        $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -358,7 +358,7 @@ class BcaHttp
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
         
-        $data     = array('grant_type' => 'client_credentials');
+        $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -480,7 +480,7 @@ class BcaHttp
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
 
-        $data     = array('grant_type' => 'client_credentials');
+        $data = array('grant_type' => 'client_credentials');
         
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
@@ -631,7 +631,7 @@ class BcaHttp
      */
     private function validateBcaKey($key)
     {
-        if (!preg_match('/\A([-a-zA-Z0-9]{7})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{12})+\z/', $key)) {
+        if (!preg_match('/\A([-a-zA-Z0-9]{7,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{12,})+\z/', $key)) {
             throw new BcaHttpException('Format `Key` tidak valid' . $key);
         }
 
