@@ -11,7 +11,7 @@ namespace Bca;
  */
 class BcaHttp
 {
-    public static $VERSION = '2.1.0';
+    public static $VERSION = '2.1.2';
 
     private static $timezone = 'Asia/Jakarta';
 
@@ -631,7 +631,7 @@ class BcaHttp
      */
     private function validateBcaKey($key)
     {
-        if (!preg_match('/\A([-a-zA-Z0-9]{7})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{4})+([\-\s])+([-a-zA-Z0-9]{12})+\z/', $key)) {
+        if (!preg_match('/\A([-a-zA-Z0-9]{7,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{12,})+\z/', $key)) {
             throw new BcaHttpException('Format `Key` tidak valid' . $key);
         }
 
