@@ -330,7 +330,7 @@ class BcaHttp
         
         $params             = array();
         $params['RateType'] = strtolower($rateType);
-        $params['Currency'] = strtoupper($currency);
+        $params['CurrencyCode'] = strtoupper($currency);
         ksort($params);
 
         $auth_query_string = self::arrayImplode('=', '&', $params);
