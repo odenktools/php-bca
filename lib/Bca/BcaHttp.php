@@ -318,7 +318,7 @@ class BcaHttp
      */
     public function getForexRate(
         $oauth_token,
-        $rateType = 'e-rate',
+        $rateType = 'eRate',
         $currency = 'USD'
     ) {
         $apikey = $this->settings['api_key'];
