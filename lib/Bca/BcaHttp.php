@@ -193,7 +193,7 @@ class BcaHttp
      * Ambil Daftar transaksi pertanggal.
      *
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
-     * @param array $sourceAccount nomor akun yang akan dicek
+     * @param string $sourceAccount nomor akun yang akan dicek
      * @param string $startDate tanggal awal
      * @param string $endDate tanggal akhir
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
