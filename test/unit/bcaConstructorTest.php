@@ -72,6 +72,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($settings);
     }
 
+    /**
+     * Testing validasi option ARRAY.
+     */
     public function testValidateArr3()
     {
         $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
@@ -85,35 +88,8 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *  @expectedException \Bca\BcaHttpException
+     * Testing constructor HOST.
      */
-    public function testCorpId()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $settings = self::invokeMethod($bca, 'validateCorpId', array(''));
-        $this->assertTrue($settings);
-    }
-
-    /**
-     *  @expectedException \Bca\BcaHttpException
-     */
-    public function testShouldTrueValidateBcaKey()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $settings = self::invokeMethod($bca, 'validateBcaKey', array('1234567-1234-1234-1345'));
-        $this->assertTrue($settings);
-    }
-
-    /**
-     *  @expectedException \Bca\BcaHttpException
-     */
-    public function testShouldFalseValidateBcaKey()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $settings = self::invokeMethod($bca, 'validateBcaKey', array('123456-123-123-134'));
-        $this->assertFalse($settings);
-    }
-
     public function testConstructHost1()
     {
         $equal    = 'sandbox.bca.co.id';
@@ -122,6 +98,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['host']);
     }
 
+    /**
+     * Testing constructor HOST.
+     */
     public function testConstructHost2()
     {
         $options         = array();
@@ -132,18 +111,6 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['host']);
     }
 
-    /**
-     * Testing constructor host
-     */
-    public function testClientGetOptions2()
-    {
-        $options         = array();
-        $equal           = 'sandbox.bca.co.id';
-        $bca             = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
-        $settings        = $bca->getSettings();
-        $this->assertEquals($equal, $settings['host']);
-    }
-    
     /**
      * Testing constructor corp_id
      */
@@ -328,5 +295,27 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $bca            = new \Bca\BcaHttp('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
         $response       = $bca->getDepositRate($token);
         $this->assertEquals($response->code, 400);
+    }
+
+    /**
+     * Testing constructor HOST.
+     */
+    public function testClientStaticHost()
+    {
+        $options         = array();
+        $equal           = 'xxxx.com';
+        $bca             = \Bca\BcaHttp::setHostName('xxxx.com');
+        $this->assertEquals($equal, \Bca\BcaHttp::getHostName());
+    }
+
+    /**
+     * Testing constructor PORT.
+     */
+    public function testClientStaticPort()
+    {
+        $options         = array();
+        $equal           = 443;
+        $bca             = \Bca\BcaHttp::setPort(443);
+        $this->assertEquals($equal, \Bca\BcaHttp::getPort());
     }
 }

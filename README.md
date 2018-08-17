@@ -28,7 +28,7 @@ Jika merasa terbantu dengan adanya library ini, jangan lupa untuk kasih STAR unt
 * [Generate Signature](https://github.com/odenktools/php-bca#generate-signature)
 * [How to contribute](https://github.com/odenktools/php-bca#how-to-contribute)
 
-### TODO (NEW BCA API on December 2017)
+### (NEW BCA API on December 2017)
 
 Get balance information
 

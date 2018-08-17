@@ -11,7 +11,7 @@ namespace Bca;
  */
 class BcaHttp
 {
-    public static $VERSION = '2.1.2';
+    public static $VERSION = '2.2.0';
 
     private static $timezone = 'Asia/Jakarta';
 
@@ -109,9 +109,6 @@ class BcaHttp
     {
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
-
-        $this->validateBcaKey($client_id);
-        $this->validateBcaKey($client_secret);
         
         $headerToken = base64_encode("$client_id:$client_secret");
 
@@ -149,9 +146,6 @@ class BcaHttp
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
         
-        $this->validateCorpId($corp_id);
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
         $this->validateArray($sourceAccountId);
 
         ksort($sourceAccountId);
@@ -207,10 +201,6 @@ class BcaHttp
         $apikey = $this->settings['api_key'];
 
         $secret = $this->settings['secret_key'];
-        
-        $this->validateCorpId($corp_id);
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
 
         $uriSign       = "GET:/banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $isoTime       = self::generateIsoTime();
@@ -263,10 +253,7 @@ class BcaHttp
         $apikey = $this->settings['api_key'];
         
         $secret = $this->settings['secret_key'];
-        
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
-        
+
         $params              = array();
         $params['SearchBy']  = 'Distance';
         $params['Latitude']  = $latitude;
@@ -324,10 +311,7 @@ class BcaHttp
         $apikey = $this->settings['api_key'];
         
         $secret = $this->settings['secret_key'];
-        
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
-        
+
         $params             = array();
         $params['RateType'] = strtolower($rateType);
         $params['Currency'] = strtoupper($currency);
@@ -394,10 +378,6 @@ class BcaHttp
         $apikey = $this->settings['api_key'];
         $secret = $this->settings['secret_key'];
 
-        $this->validateCorpId($corp_id);
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
-
         $uriSign = "POST:/banking/corporates/transfers";
         
         $isoTime = self::generateIsoTime();
@@ -459,10 +439,6 @@ class BcaHttp
         $corp_id = $this->settings['corp_id'];
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
-        
-        $this->validateCorpId($corp_id);
-        $this->validateBcaKey($apikey);
-        $this->validateBcaKey($secret);
 
         $uriSign       = "GET:/general/rate/deposit";
         $isoTime       = self::generateIsoTime();
@@ -603,39 +579,6 @@ class BcaHttp
         $ISO8601 = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
 
         return $ISO8601;
-    }
-
-    /**
-     * Validasi CORP_ID yang telah diberikan pihahk BCA.
-     *
-     * @param string $corpId
-     *
-     * @return bool
-     */
-    private function validateCorpId($corpId)
-    {
-        if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $corpId)) {
-            throw new BcaHttpException('Invalid CorpId' . $corpId);
-        }
-
-        return true;
-    }
-
-    /**
-     * Validasi Key yang telah BCA tentukan.
-     * Format 1234567-1234-1234-1345-123456789123
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    private function validateBcaKey($key)
-    {
-        if (!preg_match('/\A([-a-zA-Z0-9]{7,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{4,})+([\-\s])+([-a-zA-Z0-9]{12,})+\z/', $key)) {
-            throw new BcaHttpException('Format `Key` tidak valid' . $key);
-        }
-
-        return true;
     }
 
     /**
