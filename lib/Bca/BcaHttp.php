@@ -436,7 +436,6 @@ class BcaHttp
      */
     public function getDepositRate($oauth_token)
     {
-        $corp_id = $this->settings['corp_id'];
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
 
