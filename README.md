@@ -67,7 +67,7 @@ Transfer funds directly to beneficiary account
 ```
 
 Transfer funds to beneficiary to be taken personally
-	
+
 ```
 /fire/transactions/cash-transfer
 ```
@@ -111,42 +111,42 @@ Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID
         'development'   => true
     );
 
-	// Setting default timezone Anda
-	\Bca\BcaHttp::setTimeZone('Asia/Jakarta');
+    // Setting default timezone Anda
+    \Bca\BcaHttp::setTimeZone('Asia/Jakarta');
 
-	// ATAU
-	
-	// \Bca\BcaHttp::setTimeZone('Asia/Singapore');
+    // ATAU
 
-	$corp_id = "BCAAPI2016";
-	$client_key = "NILAI-CLIENT-KEY-ANDA";
-	$client_secret = "NILAI-CLIENT-SECRET-ANDA";
-	$apikey = "NILAI-APIKEY-ANDA";
-	$secret = "SECRETKEY-ANDA";
+    // \Bca\BcaHttp::setTimeZone('Asia/Singapore');
 
-	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
+    $corp_id = "BCAAPI2016";
+    $client_key = "NILAI-CLIENT-KEY-ANDA";
+    $client_secret = "NILAI-CLIENT-SECRET-ANDA";
+    $apikey = "NILAI-APIKEY-ANDA";
+    $secret = "SECRETKEY-ANDA";
 
-	// ATAU
+    $bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
 
-	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
+    // ATAU
+
+    $bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
 ```
 
 ### LOGIN
 
 ```php
-	$corp_id = "CORP_ID-ANDA";
-	$client_key = "NILAI-CLIENT-KEY-ANDA";
-	$client_secret = "NILAI-CLIENT-SECRET-ANDA";
-	$apikey = "NILAI-APIKEY-ANDA";
-	$secret = "SECRETKEY-ANDA";
+    $corp_id = "CORP_ID-ANDA";
+    $client_key = "NILAI-CLIENT-KEY-ANDA";
+    $client_secret = "NILAI-CLIENT-SECRET-ANDA";
+    $apikey = "NILAI-APIKEY-ANDA";
+    $secret = "SECRETKEY-ANDA";
 
-	$bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
+    $bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret);
 
-	// Request Login dan dapatkan nilai OAUTH
-	$response = $bca->httpAuth();
+    // Request Login dan dapatkan nilai OAUTH
+    $response = $bca->httpAuth();
 
-	// LIHAT HASIL OUTPUT
-	echo json_encode($response);
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 Setelah Login berhasil pastikan anda menyimpan nilai ```TOKEN``` di tempat yang aman, karena nilai ```TOKEN``` tersebut agar digunakan untuk tugas tugas berikutnya.
@@ -156,16 +156,16 @@ Setelah Login berhasil pastikan anda menyimpan nilai ```TOKEN``` di tempat yang 
 Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
-	// Nilai token yang dihasilkan saat login
-	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+    // Ini adalah nilai token yang dihasilkan saat login
+    $token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
 
-	//Nomor akun yang akan di ambil informasi saldonya, menggunakan ARRAY
-	$arrayAccNumber = array('0201245680', '0063001004', '1111111111');
+    //Nomor akun yang akan di ambil informasi saldonya, menggunakan ARRAY
+    $arrayAccNumber = array('0201245680', '0063001004', '1111111111');
 
-	$response = $bca->getBalanceInfo($token, $arrayAccNumber);
-	
-	// LIHAT HASIL OUTPUT
-	echo json_encode($response);
+    $response = $bca->getBalanceInfo($token, $arrayAccNumber);
+
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 ### FUND TRANSFER
@@ -173,84 +173,94 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
-	// Nilai token yang dihasilkan saat login
-	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+    // Ini adalah nilai token yang dihasilkan saat login
+    $token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
 
-	$amount = '50000.00';
+    $amount = '50000.00';
 
-	// Nilai akun bank anda
-	$nomorakun = '0201245680';
+    // Nilai akun bank anda
+    $nomorakun = '0201245680';
 
-	// Nilai akun bank yang akan ditransfer
-	$nomordestinasi = '0201245681';
+    // Nilai akun bank yang akan ditransfer
+    $nomordestinasi = '0201245681';
 
-	// Nomor PO, silahkan sesuaikan
-	$nomorPO = '12345/PO/2017';
+    // Nomor PO, silahkan sesuaikan
+    $nomorPO = '12345/PO/2017';
 
-	// Nomor Transaksi anda, Silahkan generate sesuai kebutuhan anda
-	$nomorTransaksiID = '00000001;
+    // Nomor Transaksi anda, Silahkan generate sesuai kebutuhan anda
+    $nomorTransaksiID = '00000001';
 
-	$response = $bca->fundTransfers($token, 
-						$amount,
-						$nomorakun,
-						$nomordestinasi,
-						$nomorPO,
-						'Testing Saja Ko',
-						'Online Saja Ko',
-						$nomorTransaksiID);
+    $remark1 = 'Transfer Test Using Odenktools BCA';
 
-	echo json_encode($response);
+    $remark2 = 'Online Transfer Using Odenktools BCA';
+
+    $response = $bca->fundTransfers($token, 
+                        $amount,
+                        $nomorakun,
+                        $nomordestinasi,
+                        $nomorPO,
+                        $remark1,
+                        $remark2,
+                        $nomorTransaksiID);
+
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
+
+Untuk data ```remark1```, ```remark2```, ```nomorPO``` akan di replace menjadi ```lowercase``` dan dihapus ```whitespace```
 
 ### ACCOUNT STATEMENT
 
 Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
-	// Nilai token yang dihasilkan saat login
-	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+    // Ini adalah nilai token yang dihasilkan saat login
+    $token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
 
-	// Nilai akun bank anda
-	$nomorakun = '0201245680';
-	
-	// Tanggal start transaksi anda
-	$startdate = '2016-08-29';
-	
-	// Tanggal akhir transaksi anda
-	$enddate = '2016-09-01';
+    // Nilai akun bank anda
+    $nomorakun = '0201245680';
 
-	$response = $bca->getAccountStatement($token, $nomorakun, $startdate, $enddate);
+    // Tanggal start transaksi anda
+    $startdate = '2016-08-29';
 
-	echo json_encode($response);
+    // Tanggal akhir transaksi anda
+    $enddate = '2016-09-01';
+
+    $response = $bca->getAccountStatement($token, $nomorakun, $startdate, $enddate);
+
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 ### FOREIGN EXCHANGE RATE
 
 ```php
-	//Tipe rate :  bn, e-rate, tt, tc
-	$rateType = 'e-rate';
+    //Tipe rate :  bn, e-rate, tt, tc
+    $rateType = 'e-rate';
 
-	$mataUang = 'usd';
+    $mataUang = 'usd';
 
-	$response = $bca->getForexRate($token, $rateType, $mataUang);
+    $response = $bca->getForexRate($token, $rateType, $mataUang);
 
-	echo json_encode($response);
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 ### NEAREST ATM LOCATOR
 
 ```php
-	$latitude = '-6.1900718';
+    $latitude = '-6.1900718';
 
-	$longitude = '106.797190';
+    $longitude = '106.797190';
 
-	$totalAtmShow = '10';
+    $totalAtmShow = '10';
 
-	$radius = '20';
+    $radius = '20';
 
-	$response = $bca->getAtmLocation($token, $latitude, $longitude, $totalAtmShow, $radius);
+    $response = $bca->getAtmLocation($token, $latitude, $longitude, $totalAtmShow, $radius);
 
-	echo json_encode($response);
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 ### DEPOSIT RATE
@@ -258,12 +268,13 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
 ```php
-	// Nilai token yang dihasilkan saat login
-	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+    // Ini adalah nilai token yang dihasilkan saat login
+    $token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
 
-	$response       = $bca->getDepositRate($token);
+    $response       = $bca->getDepositRate($token);
 
-	echo json_encode($response);
+    // Cek hasil response berhasil atau tidak
+    echo json_encode($response);
 ```
 
 ### GENERATE SIGNATURE
@@ -272,28 +283,28 @@ Saat berguna untuk keperluan testing.
 
 ```php
 
-	$secret = "NILAI-SECRET-ANDA";
-	
-	// Nilai token yang dihasilkan saat login
-	$token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
-	
-	$uriSign = "GET:/general/info-bca/atm";
-	
-	//Format timestamp harus dalam ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSTZD)
-	$isoTime = "2016-02-03T10:00:00.000+07:00";
-	
-	$bodyData = array();
-	
-	//nilai body anda disini
-	$bodyData['a'] = "BLAAA-BLLLAA";
-	$bodyData['b'] = "BLEHH-BLLLAA";
-	
-	//ketentuan BCA array harus disort terlebih dahulu
-	ksort($bodyData);
+    $secret = "NILAI-SECRET-ANDA";
 
-	$authSignature = \Bca\BcaHttp::generateSign($uriSign, $token, $secret, $isoTime, $bodyData);
-	
-	echo $authSignature;
+    // Ini adalah nilai token yang dihasilkan saat login
+    $token = "MvXPqa5bQs5U09Bbn8uejBE79BjI3NNCwXrtMnjdu52heeZmw9oXgB";
+
+    $uriSign = "GET:/general/info-bca/atm";
+
+    // Format timestamp harus dalam ISO8601 format (yyyy-MM-ddTHH:mm:ss.SSSTZD)
+    $isoTime = "2016-02-03T10:00:00.000+07:00";
+
+    $bodyData = array();
+
+    //nilai body anda disini
+    $bodyData['a'] = "BLAAA-BLLLAA";
+    $bodyData['b'] = "BLEHH-BLLLAA";
+
+    //ketentuan BCA array harus disort terlebih dahulu
+    ksort($bodyData);
+
+    $authSignature = \Bca\BcaHttp::generateSign($uriSign, $token, $secret, $isoTime, $bodyData);
+
+    echo $authSignature;
 ```
 
 # TESTING
