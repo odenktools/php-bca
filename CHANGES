@@ -1,3 +1,16 @@
+Version 2.2.1:
+ - * strip all body to lowercase * strip all body whitespace * modified documentation
+ - Merge pull request #12 from odenktools/odenktools-patch-1
+ - Update issue templates
+ - Merge pull request #11 from odenktools/add-code-of-conduct-1
+ - Create CODE_OF_CONDUCT.md
+ - Create CONTRIBUTING.md
+ - Update README.md
+ - Hapus parameter tidak terpakai
+ - - Hapus validasi secretkey, clientkey, corpid
+ - fixing spacing
+ - perbaiki validasi key bca
+
 Version 2.1.1:
  - perbaikan constructor
  - Perbaikan readme dan unitest #2

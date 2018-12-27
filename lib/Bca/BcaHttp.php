@@ -197,7 +197,7 @@ class BcaHttp
     public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate)
     {
         $corp_id = $this->settings['corp_id'];
-        
+
         $apikey = $this->settings['api_key'];
 
         $secret = $this->settings['secret_key'];
@@ -309,7 +309,7 @@ class BcaHttp
         $currency = 'USD'
     ) {
         $apikey = $this->settings['api_key'];
-        
+
         $secret = $this->settings['secret_key'];
 
         $params             = array();
@@ -395,21 +395,18 @@ class BcaHttp
 
         $bodyData                             = array();
         $bodyData['Amount']                   = $amount;
-        $bodyData['BeneficiaryAccountNumber'] = $beneficiaryAccountNumber;
-        $bodyData['CorporateID']              = $corp_id;
-        $bodyData['CurrencyCode']             = 'IDR';
-        $bodyData['ReferenceID']              = $referenceID;
+        $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', $beneficiaryAccountNumber));
+        $bodyData['CorporateID']              = strtolower(str_replace(' ', '', $corp_id));
+        $bodyData['CurrencyCode']             = 'idr';
+        $bodyData['ReferenceID']              = strtolower(str_replace(' ', '', $referenceID));
         $bodyData['Remark1']                  = strtolower(str_replace(' ', '', $remark1));
         $bodyData['Remark2']                  = strtolower(str_replace(' ', '', $remark2));
-        $bodyData['SourceAccountNumber']      = $sourceAccountNumber;
+        $bodyData['SourceAccountNumber']      = strtolower(str_replace(' ', '', $sourceAccountNumber));
         $bodyData['TransactionDate']          = $isoTime;
-        $bodyData['TransactionID']            = $transactionID;
+        $bodyData['TransactionID']            = strtolower(str_replace(' ', '', $transactionID));
 
         // Harus disort agar mudah kalkulasi HMAC
         ksort($bodyData);
-
-        // Supaya jgn strip "ReferenceID" "/" jadi "/\" karena HMAC akan menjadi tidak cocok
-        $encoderData = json_encode($bodyData, JSON_UNESCAPED_SLASHES);
 
         $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, $bodyData);
 
@@ -421,12 +418,16 @@ class BcaHttp
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
+
+        // Supaya jgn strip "ReferenceID" "/" jadi "/\" karena HMAC akan menjadi tidak cocok
+        $encoderData = json_encode($bodyData, JSON_UNESCAPED_SLASHES);
+
         $body     = \Unirest\Request\Body::form($encoderData);
         $response = \Unirest\Request::post($full_url, $headers, $body);
 
         return $response;
     }
-    
+
     /**
      * Realtime deposit untuk produk BCA.
      *
@@ -469,15 +470,15 @@ class BcaHttp
 
         return $response;
     }
-    
+
     /**
      * Generate Signature.
      *
-     * @param string $url Url yang akan disign
-     * @param string $auth_token string nilai token dari login
-     * @param string $secret_key string secretkey yang telah diberikan oleh BCA
-     * @param string $isoTime string Waktu ISO8601
-     * @param array $bodyToHash array Body yang akan dikirimkan ke Server BCA
+     * @param string $url Url yang akan disign.
+     * @param string $auth_token string nilai token dari login.
+     * @param string $secret_key string secretkey yang telah diberikan oleh BCA.
+     * @param string $isoTime string Waktu ISO8601.
+     * @param array $bodyToHash array Body yang akan dikirimkan ke Server BCA.
      *
      * @return string
      */
