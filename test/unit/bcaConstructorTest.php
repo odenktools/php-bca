@@ -318,30 +318,4 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $bca             = \Bca\BcaHttp::setPort(443);
         $this->assertEquals($equal, \Bca\BcaHttp::getPort());
     }
-
-    public function testDomesticFund()
-    {
-        $options         = array();
-        $bca = new \Bca\BcaHttp('BCAAPI', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', $options);
-
-        $token = "o7d8qCgfsHwRneFGTHdQsFcS5Obmd26O10iBFRi50Ve8Yb06Ju5xx";
-
-        $response = $bca->fundDomesticTransfers(
-            $token,
-            '50000.00',
-            '0201245680',
-            '0201245501',
-            'BRONINJA',
-            'Fulan',
-            \Bca\BcaHttp::LLG,
-            \Bca\BcaHttp::PERSONAL,
-            \Bca\BcaHttp::RESIDENCE,
-            '12345/PO/2017',
-            'Testing Saja Ko',
-            'Online Saja Ko',
-            '00000001'
-        );
-
-        $this->assertEquals($response->code, 404);
-    }
 }

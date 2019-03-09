@@ -2,4 +2,3 @@ vendor
 .php_cs.cache
 composer.lock
 build
-test/config.php
