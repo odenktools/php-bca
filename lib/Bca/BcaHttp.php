@@ -32,14 +32,6 @@ class BcaHttp
         'development'   => true,
     );
 
-    const LLG = 'LLG';
-    const RTG = 'RTG';
-    const PERSONAL = '1';
-    const CORPORATE = '2';
-    const GOVERNMENT = '3';
-    const RESIDENCE = '1';
-    const NON_RESIDENCE = '2';
-
     /**
      * Default Constructor.
      *
@@ -79,7 +71,7 @@ class BcaHttp
         $this->settings['client_secret'] = $client_secret;
         $this->settings['api_key']       = $api_key;
         $this->settings['secret_key']    = $secret_key;
-
+        
         $this->settings['host'] =
             preg_replace('/http[s]?\:\/\//', '', $this->settings['host'], 1);
     }
@@ -117,7 +109,7 @@ class BcaHttp
     {
         $client_id     = $this->settings['client_id'];
         $client_secret = $this->settings['client_secret'];
-
+        
         $headerToken = base64_encode("$client_id:$client_secret");
 
         $headers = array('Accept' => 'application/json', 'Authorization' => "Basic $headerToken");
@@ -125,7 +117,7 @@ class BcaHttp
         $request_path = "api/oauth/token";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
-
+        
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
@@ -153,7 +145,7 @@ class BcaHttp
         $corp_id = $this->settings['corp_id'];
         $apikey  = $this->settings['api_key'];
         $secret  = $this->settings['secret_key'];
-
+        
         $this->validateArray($sourceAccountId);
 
         ksort($sourceAccountId);
@@ -175,7 +167,7 @@ class BcaHttp
         $request_path = "banking/v3/corporates/$corp_id/accounts/$arraySplit";
         $domain       = $this->ddnDomain();
         $full_url     = $domain . $request_path;
-
+        
         $data = array('grant_type' => 'client_credentials');
 
         \Unirest\Request::curlOpts(array(
@@ -232,7 +224,7 @@ class BcaHttp
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-
+        
         $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -259,7 +251,7 @@ class BcaHttp
         $radius = '20'
     ) {
         $apikey = $this->settings['api_key'];
-
+        
         $secret = $this->settings['secret_key'];
 
         $params              = array();
@@ -294,7 +286,7 @@ class BcaHttp
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-
+        
         $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -349,7 +341,7 @@ class BcaHttp
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-
+        
         $data = array('grant_type' => 'client_credentials');
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
@@ -387,7 +379,7 @@ class BcaHttp
         $secret = $this->settings['secret_key'];
 
         $uriSign = "POST:/banking/corporates/transfers";
-
+        
         $isoTime = self::generateIsoTime();
 
         $headers                    = array();
@@ -465,14 +457,14 @@ class BcaHttp
         $full_url     = $domain . $request_path;
 
         $data = array('grant_type' => 'client_credentials');
-
+        
         \Unirest\Request::curlOpts(array(
             CURLOPT_SSL_VERIFYHOST => 0,
             CURLOPT_SSLVERSION => 6,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
         ));
-
+        
         $body     = \Unirest\Request\Body::form($data);
         $response = \Unirest\Request::get($full_url, $headers, $body);
 
@@ -608,7 +600,7 @@ class BcaHttp
 
         return true;
     }
-
+    
     /**
      * Implode an array with the key and value pair giving
      * a glue, a separator between pairs and the array
@@ -634,101 +626,5 @@ class BcaHttp
         }
 
         return implode($separator, $string);
-    }
-
-    /**
-     * Transfer dana kepada akun lain beda bank dengan jumlah nominal tertentu.
-     *
-     * @param string $oauth_token nilai token yang telah didapatkan setelah login
-     * @param int $amount nilai dana dalam RUPIAH yang akan ditransfer, Format: 13.2
-     * @param string $beneficiaryAccountNumber  BCA Account number to be credited (Destination)
-     * @param string $beneficiaryBankCode Kode Bank Tujuan
-     * @param string $beneficiaryName Nama Nasabah Tujuan
-     * @param string $beneficiaryCustResidence 1 = Resident 2 = Non Resident
-     * @param string $beneficiaryCustType 1 = Personal 2 = Corporate 3 = Government
-     * @param string $transferType LLG or RTG
-     * @param string $referenceID Sender's transaction reference ID
-     * @param string $remark1 Transfer remark for receiver
-     * @param string $remark2 ransfer remark for receiver
-     * @param string $sourceAccountNumber Source of Fund Account Number
-     * @param string $transactionID Transcation ID unique per day (using UTC+07 Time Zone). Format: Number
-     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA [Optional]
-     *
-     * @return \Unirest\Response
-     */
-    public function fundDomesticTransfers(
-        $oauth_token,
-        $amount,
-        $sourceAccountNumber,
-        $beneficiaryAccountNumber,
-        $beneficiaryBankCode,
-        $beneficiaryName,
-        $transferType,
-        $beneficiaryCustType,
-        $beneficiaryCustResidence,
-        $referenceID,
-        $remark1,
-        $remark2,
-        $transactionID
-    ) {
-        $corp_id = $this->settings['corp_id'];
-        $apikey = $this->settings['api_key'];
-        $secret = $this->settings['secret_key'];
-
-        $uriSign = "POST:/banking/corporates/transfers/domestic";
-
-        $isoTime = self::generateIsoTime();
-
-        $headers                    = array();
-        $headers['Accept']          = 'application/json';
-        $headers['Content-Type']    = 'application/json';
-        $headers['Authorization']   = "Bearer $oauth_token";
-        $headers['X-BCA-Key']       = $apikey;
-        $headers['X-BCA-Timestamp'] = $isoTime;
-        $headers['ChannelID']       = '95051';
-        $headers['CredentialID']    = $corp_id;
-
-        $request_path = "banking/corporates/transfers/domestic";
-        $domain       = $this->ddnDomain();
-        $full_url     = $domain . $request_path;
-
-        $bodyData                             = array();
-        $bodyData['Amount']                   = $amount;
-        $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', $beneficiaryAccountNumber));
-        $bodyData['BeneficiaryBankCode']      = $beneficiaryBankCode;
-        $bodyData['BeneficiaryName']          = $beneficiaryName;
-        $bodyData['BeneficiaryCustType']      = $beneficiaryCustType;
-        $bodyData['BeneficiaryCustResidence'] = $beneficiaryCustResidence;
-        $bodyData['TransferType']             = $transferType;
-        $bodyData['CorporateID']              = strtolower(str_replace(' ', '', $corp_id));
-        $bodyData['CurrencyCode']             = 'idr';
-        $bodyData['ReferenceID']              = strtolower(str_replace(' ', '', $referenceID));
-        $bodyData['Remark1']                  = strtolower(str_replace(' ', '', $remark1));
-        $bodyData['Remark2']                  = strtolower(str_replace(' ', '', $remark2));
-        $bodyData['SourceAccountNumber']      = strtolower(str_replace(' ', '', $sourceAccountNumber));
-        $bodyData['TransactionDate']          = $isoTime;
-        $bodyData['TransactionID']            = strtolower(str_replace(' ', '', $transactionID));
-
-        // Harus disort agar mudah kalkulasi HMAC
-        ksort($bodyData);
-
-        $authSignature = self::generateSign($uriSign, $oauth_token, $secret, $isoTime, $bodyData);
-
-        $headers['X-BCA-Signature'] = $authSignature;
-
-        \Unirest\Request::curlOpts(array(
-            CURLOPT_SSL_VERIFYHOST => 0,
-            CURLOPT_SSLVERSION => 6,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_TIMEOUT => $this->settings['timeout'] !== 30 ? $this->settings['timeout'] : 30
-        ));
-
-        // Supaya jgn strip "ReferenceID" "/" jadi "/\" karena HMAC akan menjadi tidak cocok
-        $encoderData = json_encode($bodyData, JSON_UNESCAPED_SLASHES);
-
-        $body     = \Unirest\Request\Body::form($encoderData);
-        $response = \Unirest\Request::post($full_url, $headers, $body);
-
-        return $response;
     }
 }
