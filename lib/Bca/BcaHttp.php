@@ -590,10 +590,14 @@ class BcaHttp
      */
     private function validateArray($sourceAccountId = [])
     {
+        if (!is_array($sourceAccountId)) {
+            throw new BcaHttpException('Data harus array.');
+        }
         if (empty($sourceAccountId)) {
             throw new BcaHttpException('AccountNumber tidak boleh kosong.');
         } else {
-            if (count($sourceAccountId) > 20) {
+            $max = sizeof($sourceAccountId);
+            if ($max > 20) {
                 throw new BcaHttpException('Maksimal Account Number ' . 20);
             }
         }

@@ -54,7 +54,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *  @expectedException \Bca\BcaHttpException
+     * Test fail jika nomor akun kosong.
+     *
+     * @expectedException \Bca\BcaHttpException
      */
     public function testValidateArr()
     {
@@ -65,12 +67,14 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     *  @expectedException \Bca\BcaHttpException
+     * Test fail nomor akun lebih dari 20.
+     *
+     * @expectedException \Bca\BcaHttpException
      */
     public function testValidateArr2()
     {
         $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $arr = array('1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1','1');
+        $arr = array('001', '002', '003', '004', '005', '006', '007', '008', '009', '010', '011', '012', '013', '014', '015', '016', '017', '018', '019', '020', '021', '022');
         $settings = self::invokeMethod($bca, 'validateArray', array($arr));
         $this->assertTrue($settings);
     }
@@ -81,13 +85,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     public function testValidateArr3()
     {
         $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        try {
-            $settings = self::invokeMethod($bca, 'validateArray', array('1'));
-            $this->assertTrue($settings);
-        } catch (\Bca\BcaHttpException $e) {
-            $this->fail();
-        }
-        $this->assertTrue(true);
+        $arr = array('001');
+        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
+        $this->assertTrue($settings);
     }
 
     /**
@@ -115,7 +115,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * Testing constructor corp_id
+     * Testing constructor corp_id.
      */
     public function testClientCorpId()
     {
@@ -127,6 +127,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['corp_id']);
     }
 
+    /**
+     * Testing constructor client_id.
+     */
     public function testClientIdParameter()
     {
         $options         = array();
@@ -138,6 +141,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['client_id']);
     }
 
+    /**
+     * Testing constructor client_secret.
+     */
     public function testClientSecretParameter()
     {
         $options         = array();
@@ -149,6 +155,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['client_secret']);
     }
 
+    /**
+     * Testing constructor api_key.
+     */
     public function testApiKeyParameter()
     {
         $options         = array();
@@ -160,6 +169,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['api_key']);
     }
 
+    /**
+     * Testing constructor secret_key.
+     */
     public function testSecretParameter()
     {
         $secret = '1234567-1234-1234-1345-123456789123';
@@ -170,6 +182,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($equal, $settings['secret_key']);
     }
 
+    /**
+     * Testing set timezone.
+     */
     public function testTimeZone()
     {
         \Bca\BcaHttp::setTimeZone('Asia/Singapore');
@@ -181,6 +196,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * Testing Authentikasi.
+     */
     public function testAuth()
     {
         $options         = array();
@@ -189,6 +207,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->code, 400);
     }
 
+    /**
+     * Testing Fund Transfer.
+     */
     public function testFund()
     {
         $options         = array();
@@ -210,6 +231,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->code, 400);
     }
 
+    /**
+     * Testing Fund Transfer Menggunakan domain yang salah.
+     */
     public function testFund2()
     {
         $options         = array();
@@ -233,7 +257,10 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
             $this->assertNotEquals($ex->getMessage(), 'Failed to connect to abcdefgh.com');
         }
     }
-    
+
+    /**
+     * Testing Generate Signature.
+     */
     public function testGenerateSign()
     {
         $options        = array();
@@ -249,6 +276,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($authSignature, $output);
     }
 
+    /**
+     * Testing Mendapatkan Lokasi ATM BCA.
+     */
     public function testAtmLocation()
     {
         $options = array();
@@ -262,6 +292,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->code, 400);
     }
 
+    /**
+     * Testing Mendapatkan data Forex.
+     */
     public function testGetForex()
     {
         $options = array();
@@ -272,6 +305,9 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($response->code, 400);
     }
 
+    /**
+     * Testing Mendapatkan data Forex.
+     */
     public function testGetAccountStatement()
     {
         $options = array();
