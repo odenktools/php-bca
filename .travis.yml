@@ -1,40 +1,48 @@
-sudo: false
-
 language: php
-
-cache:
-  directories:
-    - $HOME/.composer/cache
-
-env:
-  global:
-    - COVERAGE=1 XDEBUG=0
+sudo: false
+dist: trusty
 
 matrix:
   include:
     - php: 5.4
+      env:
+        - PHPUNIT_VERSION=^4.8
     - php: 5.5
+      env:
+        - PHPUNIT_VERSION=^4.8
     - php: 5.6
-    - php: hhvm
-      env: XDEBUG=1   
+      env:
+        - COVERAGE=1 XDEBUG=1
+        - PHPUNIT_VERSION=^5.7
     - php: 7.0
-      env: COVERAGE=1 XDEBUG=1
+      env:
+        - COVERAGE=1 XDEBUG=1
+        - PHPUNIT_VERSION=^5.7
     - php: 7.1
-      env: COVERAGE=1 XDEBUG=1
+      env:
+        - COVERAGE=1 XDEBUG=1
+        - PHPUNIT_VERSION=^7.5
     - php: 7.2
-      env: COVERAGE=1 XDEBUG=1
+      env:
+        - COVERAGE=1 XDEBUG=1
+        - PHPUNIT_VERSION=^7.5
+    - php: 7.3
+      env:
+        - COVERAGE=1 XDEBUG=1
+        - PHPUNIT_VERSION=^8.0
   fast_finish: true
   allow_failures:
-    - php: 7.0
-    - php: 7.1
-    - php: 7.2
+    - php: 7.3
 
 before_script:
-  - travis_retry composer self-update
+  - curl --version
+  - composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --dev --no-update -n
   - travis_retry composer install --no-interaction --prefer-source --dev
+  - if [[ "$TRAVIS_PHP_VERSION" != "7.0" || "$TRAVIS_PHP_VERSION" != "7.1" ]]; then echo "xdebug.overload_var_dump = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini || true; fi
 
 script:
-  - composer test:ci
+  - if [ "$TRAVIS_PHP_VERSION" != "7.1" ]; then vendor/bin/phpunit; fi
+  - if [ "$TRAVIS_PHP_VERSION" == "7.1" ]; then vendor/bin/phpunit --verbose --coverage-text --coverage-clover build/logs/clover.xml; fi
 
 after_success:
   bash <(curl -s https://codecov.io/bash)

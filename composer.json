@@ -2,7 +2,15 @@
   "name": "odenktools/php-bca",
   "type": "library",
   "description": "Library REST API Untuk Develop BCA Payment",
-  "keywords": ["bca", "php", "rest", "banking"],
+  "keywords": [
+      "http",
+      "rest",
+      "php",
+      "BCA",
+      "BCA PHP",
+      "banking",
+      "HTTP client"
+  ],
   "homepage": "https://github.com/odenktools/php-bca",
   "license": "MIT",
   "authors": [{
@@ -18,12 +26,12 @@
     "nesbot/carbon": "~1.18"
   },
   "require-dev": {
-    "phpunit/phpunit": "~4"
+    "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.4 || ^7.0"
   },
   "autoload": {
     "psr-0": {
       "Bca\\": "lib/"
-    }  
+    }
   },
   "config": {
     "sort-packages": true
