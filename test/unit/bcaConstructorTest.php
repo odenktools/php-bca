@@ -313,7 +313,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
 
         $authSignature  = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, $bodyData);
 
-        $output = "b095f9a548da7997df8cf0198aefe6f0c8f7cf9faaddbeccd58061f6c2a75a45";
+        $output = "781c1e8b34eae2332d674a0786234c8e45c26d4dadaad09babf1a4df1cab6148";
 
         $this->assertEquals($authSignature, $output);
     }
