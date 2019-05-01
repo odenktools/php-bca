@@ -42,7 +42,7 @@ class BcaHttp
      * @param string $secret_key nilai oauth secret
      * @param array $options opsi ke server bca
      */
-    public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = array())
+    public function __construct($corp_id, $client_id, $client_secret, $api_key, $secret_key, $options = [])
     {
         if (!isset($options['port'])) {
             $options['port'] = self::getPort();
@@ -478,19 +478,17 @@ class BcaHttp
      * @param string $auth_token string nilai token dari login.
      * @param string $secret_key string secretkey yang telah diberikan oleh BCA.
      * @param string $isoTime string Waktu ISO8601.
-     * @param array $bodyToHash array Body yang akan dikirimkan ke Server BCA.
+     * @param array|mixed $bodyToHash array Body yang akan dikirimkan ke Server BCA.
      *
      * @return string
      */
-    public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash)
+    public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash = [])
     {
-        $hash = null;
+        $hash = hash("sha256", "");
         if (is_array($bodyToHash)) {
             ksort($bodyToHash);
             $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
             $hash        = hash("sha256", $encoderData);
-        } else {
-            $hash = hash("sha256", "");
         }
         $stringToSign   = $url . ":" . $auth_token . ":" . $hash . ":" . $isoTime;
         $auth_signature = hash_hmac('sha256', $stringToSign, $secret_key, false);
@@ -604,7 +602,7 @@ class BcaHttp
 
         return true;
     }
-    
+
     /**
      * Implode an array with the key and value pair giving
      * a glue, a separator between pairs and the array
@@ -616,12 +614,14 @@ class BcaHttp
      *
      * @return string The imploded array
      */
-    public static function arrayImplode($glue, $separator, $array)
+    public static function arrayImplode($glue, $separator, $array = [])
     {
         if (!is_array($array)) {
             throw new BcaHttpException('Data harus array.');
         }
-        $string = array();
+        if (empty($array)) {
+            throw new BcaHttpException('parameter array tidak boleh kosong.');
+        }
         foreach ($array as $key => $val) {
             if (is_array($val)) {
                 $val = implode(',', $val);

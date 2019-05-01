@@ -54,6 +54,17 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * Testing jika array kosong.
+     *
+     *  @expectedException \Bca\BcaHttpException
+     */
+    public function testArrayImplode4()
+    {
+        $query = \Bca\BcaHttp::arrayImplode('=', '&', array());
+        $this->assertEquals('parameter array tidak boleh kosong.', $query);
+    }
+
+    /**
      * Test fail jika nomor akun kosong.
      *
      * @expectedException \Bca\BcaHttpException
@@ -272,6 +283,37 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $authSignature  = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, null);
 
         $output = "761eaec0e544c9cf5010b406ade39228ab182401e57f17fc54b9daa5ad99d0d6";
+
+        $this->assertEquals($authSignature, $output);
+    }
+
+    /**
+     * Testing Generate Signature Nomor 2.
+     */
+    public function testGenerateSign2()
+    {
+        $options        = array();
+        $token          = "NopUsBuSbT3eNrQTfcEZN2aAL52JT1SlRgoL1MIslsX5gGIgv4YUf";
+        $arrayAccNumber = array('0063001004');
+        $arraySplit     = implode(",", $arrayAccNumber);
+        $uriSign        = "GET:/banking/v2/corporates/corpid/accounts/$arraySplit";
+        $isoTime        = "2019-02-30T22:03:35.800+07:00";
+
+        $bodyData                             = array();
+        $bodyData['Amount']                   = $amount;
+        $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', '8329389'));
+        $bodyData['CorporateID']              = strtolower(str_replace(' ', '', '8293489283499'));
+        $bodyData['CurrencyCode']             = 'idr';
+        $bodyData['ReferenceID']              = strtolower(str_replace(' ', '', ""));
+        $bodyData['Remark1']                  = strtolower(str_replace(' ', '', "Ini adalah remark1"));
+        $bodyData['Remark2']                  = strtolower(str_replace(' ', '', "Ini adalah remark2"));
+        $bodyData['SourceAccountNumber']      = strtolower(str_replace(' ', '', "09202990"));
+        $bodyData['TransactionDate']          = $isoTime;
+        $bodyData['TransactionID']            = strtolower(str_replace(' ', '', $transactionID));
+
+        $authSignature  = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, $bodyData);
+
+        $output = "b095f9a548da7997df8cf0198aefe6f0c8f7cf9faaddbeccd58061f6c2a75a45";
 
         $this->assertEquals($authSignature, $output);
     }
