@@ -300,7 +300,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $isoTime        = "2019-02-30T22:03:35.800+07:00";
 
         $bodyData                             = array();
-        $bodyData['Amount']                   = $amount;
+        $bodyData['Amount']                   = '100000.00';
         $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', '8329389'));
         $bodyData['CorporateID']              = strtolower(str_replace(' ', '', '8293489283499'));
         $bodyData['CurrencyCode']             = 'idr';
