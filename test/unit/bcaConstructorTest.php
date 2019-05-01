@@ -300,20 +300,20 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $isoTime        = "2019-02-30T22:03:35.800+07:00";
 
         $bodyData                             = array();
-        $bodyData['Amount']                   = '100000.00';
-        $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', '8329389'));
-        $bodyData['CorporateID']              = strtolower(str_replace(' ', '', '8293489283499'));
-        $bodyData['CurrencyCode']             = 'idr';
+        $bodyData['Amount']                   = "100000.00";
+        $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', "8329389"));
+        $bodyData['CorporateID']              = strtolower(str_replace(' ', '', "8293489283499"));
+        $bodyData['CurrencyCode']             = "idr";
         $bodyData['ReferenceID']              = strtolower(str_replace(' ', '', ""));
         $bodyData['Remark1']                  = strtolower(str_replace(' ', '', "Ini adalah remark1"));
         $bodyData['Remark2']                  = strtolower(str_replace(' ', '', "Ini adalah remark2"));
         $bodyData['SourceAccountNumber']      = strtolower(str_replace(' ', '', "09202990"));
         $bodyData['TransactionDate']          = $isoTime;
-        $bodyData['TransactionID']            = strtolower(str_replace(' ', '', $transactionID));
+        $bodyData['TransactionID']            = strtolower(str_replace(' ', '', "0020292"));
 
         $authSignature  = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, $bodyData);
 
-        $output = "781c1e8b34eae2332d674a0786234c8e45c26d4dadaad09babf1a4df1cab6148";
+        $output = "1878f0eedcd93ff53054c8fc9ea271a29c99ea2f752f636c1cc765948009a90b";
 
         $this->assertEquals($authSignature, $output);
     }
