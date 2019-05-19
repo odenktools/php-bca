@@ -53,6 +53,18 @@ class BcaHttp
     private static $timeOut = 60;
 
     /**
+     * Default Curl Options.
+     *
+     * @var int
+     */
+    private static $curlOptions = array(
+        CURLOPT_SSL_VERIFYHOST => 0,
+        CURLOPT_SSLVERSION => 6,
+        CURLOPT_SSL_VERIFYPEER => false,
+        CURLOPT_TIMEOUT => 60
+    );
+
+    /**
      * Default BCA Settings.
      *
      * @var array
@@ -64,6 +76,13 @@ class BcaHttp
         'api_key' => '',
         'secret_key' => '',
         'curl_options' => array(),
+        // Backward compatible
+        'host' => 'sandbox.bca.co.id',
+        'scheme' => 'https',
+        'timeout' => 60,
+        'port' => 443,
+        'timezone' => 'Asia/Jakarta',
+        // New Options
         'options' => array(
             'host' => 'sandbox.bca.co.id',
             'scheme' => 'https',
@@ -146,15 +165,12 @@ class BcaHttp
         }
 
         // Set Default Curl Options.
-        Request::clearDefaultHeaders();
-        Request::curlOpt(CURLOPT_SSL_VERIFYHOST, 0);
-        Request::curlOpt(CURLOPT_SSLVERSION, 6);
-        Request::curlOpt(CURLOPT_SSL_VERIFYPEER, false);
-        Request::curlOpt(CURLOPT_TIMEOUT, $this->settings['timeout']);
+        Request::curlOpts(self::$curlOptions);
 
         // Set custom curl options
         if (!empty($this->settings['curl_options'])) {
-            Request::curlOpts($this->settings['curl_options']);
+            $data = self::mergeCurlOptions(self::$curlOptions, $this->settings['curl_options']);
+            Request::curlOpts($data);
         }
     }
 
@@ -569,6 +585,28 @@ class BcaHttp
     }
 
     /**
+     * Ambil nama domain BCA yang akan dipergunakan.
+     *
+     * @return string
+     */
+    public static function getCurlOptions()
+    {
+        return self::$curlOptions;
+    }
+
+    /**
+     * Setup curl options.
+     *
+     * @param array $curlOpts
+     * @return array
+     */
+    public static function setCurlOptions(array $curlOpts = [])
+    {
+        $data = self::mergeCurlOptions(self::$curlOptions, $curlOpts);
+        self::$curlOptions = $data;
+    }
+
+    /**
      * Set Ambil maximum execution time.
      *
      * @param int $timeOut timeout in milisecond.
@@ -578,6 +616,7 @@ class BcaHttp
     public static function setTimeOut($timeOut)
     {
         self::$timeOut = $timeOut;
+        return self::$timeOut;
     }
 
     /**
@@ -639,6 +678,19 @@ class BcaHttp
         $ISO8601 = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
 
         return $ISO8601;
+    }
+
+    /**
+     * Merge from existing array.
+     *
+     * @param array $existing_options
+     * @param array $new_options
+     * @return array
+     */
+    private static function mergeCurlOptions(&$existing_options, $new_options)
+    {
+        $existing_options = $new_options + $existing_options;
+        return $existing_options;
     }
 
     /**

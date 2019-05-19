@@ -497,4 +497,24 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
             'http'
         );
     }
+
+    /**
+     * Testing set scheme.
+     */
+    public function testCurl()
+    {
+        $curl_opts = array(CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4);
+        \Bca\BcaHttp::setCurlOptions($curl_opts);
+        $scheme = \Bca\BcaHttp::getCurlOptions();
+        $this->assertEquals(
+            $scheme,
+            array(
+                CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSLVERSION => 6,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_TIMEOUT => 60
+            )
+        );
+    }
 }
