@@ -131,6 +131,41 @@ Sebelum masuk ke tahap ```LOGIN``` pastikan seluruh kebutuhan seperti ```CORP_ID
     $bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
 ```
 
+Menggunakan custom **Curl Options**
+
+```php
+    $options = array(
+        'curl_options'  => array(
+            CURLOPT_SSL_VERIFYHOST => 0,
+            CURLOPT_SSLVERSION => 6,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_TIMEOUT => 60
+        ),
+        'scheme'        => 'https',
+        'port'          => 443,
+        'host'          => 'sandbox.bca.co.id',
+        'timezone'      => 'Asia/Jakarta',
+        'timeout'       => 30,
+        'debug'         => true,
+        'development'   => true
+    );
+
+    // Setting default timezone Anda
+    \Bca\BcaHttp::setTimeZone('Asia/Jakarta');
+
+    // ATAU
+
+    // \Bca\BcaHttp::setTimeZone('Asia/Singapore');
+
+    $corp_id = "BCAAPI2016";
+    $client_key = "NILAI-CLIENT-KEY-ANDA";
+    $client_secret = "NILAI-CLIENT-SECRET-ANDA";
+    $apikey = "NILAI-APIKEY-ANDA";
+    $secret = "SECRETKEY-ANDA";
+
+    $bca = new \Bca\BcaHttp($corp_id, $client_key, $client_secret, $apikey, $secret, $options);
+```
+
 ### LOGIN
 
 ```php
