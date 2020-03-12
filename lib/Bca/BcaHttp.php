@@ -270,7 +270,7 @@ class BcaHttp
      * Ambil Daftar transaksi pertanggal.
      *
      * @param string $oauth_token nilai token yang telah didapatkan setelah login
-     * @param array $sourceAccount nomor akun yang akan dicek
+     * @param string $sourceAccount nomor akun yang akan dicek
      * @param string $startDate tanggal awal
      * @param string $endDate tanggal akhir
      * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
@@ -369,13 +369,13 @@ class BcaHttp
      */
     public function getForexRate(
         $oauth_token,
-        $rateType = 'e-rate',
+        $rateType = 'eRate',
         $currency = 'USD'
     )
     {
         $params = array();
         $params['RateType'] = strtolower($rateType);
-        $params['Currency'] = strtoupper($currency);
+        $params['CurrencyCode'] = strtoupper($currency);
         ksort($params);
 
         $auth_query_string = self::arrayImplode('=', '&', $params);
