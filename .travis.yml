@@ -1,6 +1,6 @@
 language: php
 sudo: false
-dist: trusty
+dist: bionic
 
 matrix:
   include:
@@ -34,11 +34,19 @@ matrix:
   allow_failures:
     - php: 7.3
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 before_script:
+  - phpenv config-rm xdebug.ini || true
   - curl --version
-  - composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --dev --no-update -n
-  - travis_retry composer install --no-interaction --prefer-source --dev
+  - travis_retry composer self-update
   - if [[ "$TRAVIS_PHP_VERSION" != "7.0" || "$TRAVIS_PHP_VERSION" != "7.1" ]]; then echo "xdebug.overload_var_dump = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini || true; fi
+
+install:
+  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+  - composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --dev --no-update -n
 
 script:
   - if [ "$TRAVIS_PHP_VERSION" != "7.1" ]; then vendor/bin/phpunit; fi

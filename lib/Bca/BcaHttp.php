@@ -2,7 +2,6 @@
 
 namespace Bca;
 
-use Carbon\Carbon;
 use Unirest\Request;
 use Unirest\Request\Body;
 
@@ -169,7 +168,7 @@ class BcaHttp
 
         // Set custom curl options
         if (!empty($this->settings['curl_options'])) {
-            $data = self::mergeCurlOptions(self::$curlOptions, $this->settings['curl_options']);
+            $data = BcaHelper::mergeCurlOptions(self::$curlOptions, $this->settings['curl_options']);
             Request::curlOpts($data);
         }
     }
@@ -236,15 +235,15 @@ class BcaHttp
     {
         $corp_id = $this->settings['corp_id'];
 
-        $this->validateArray($sourceAccountId);
+        BcaHelper::validateArray($sourceAccountId);
 
         ksort($sourceAccountId);
         $arraySplit = implode(",", $sourceAccountId);
         $arraySplit = urlencode($arraySplit);
 
         $uriSign = "GET:/banking/v3/corporates/$corp_id/accounts/$arraySplit";
-        $isoTime = self::generateIsoTime();
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
 
         $headers = array();
         $headers['Accept'] = 'application/json';
@@ -281,8 +280,8 @@ class BcaHttp
     {
         $corp_id = $this->settings['corp_id'];
         $uriSign = "GET:/banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
-        $isoTime = self::generateIsoTime();
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
         $headers = array();
         $headers['Accept'] = 'application/json';
         $headers['Content-Type'] = 'application/json';
@@ -328,11 +327,11 @@ class BcaHttp
         $params['Radius'] = $radius;
         ksort($params);
 
-        $auth_query_string = self::arrayImplode('=', '&', $params);
+        $auth_query_string = BcaHelper::arrayImplode('=', '&', $params);
 
         $uriSign = "GET:/general/info-bca/atm?$auth_query_string";
-        $isoTime = self::generateIsoTime();
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
 
         $headers = array();
         $headers['Accept'] = 'application/json';
@@ -374,11 +373,11 @@ class BcaHttp
         $params['Currency'] = strtoupper($currency);
         ksort($params);
 
-        $auth_query_string = self::arrayImplode('=', '&', $params);
+        $auth_query_string = BcaHelper::arrayImplode('=', '&', $params);
 
         $uriSign = "GET:/general/rate/forex?$auth_query_string";
-        $isoTime = self::generateIsoTime();
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
 
         $headers = array();
         $headers['Accept'] = 'application/json';
@@ -428,7 +427,7 @@ class BcaHttp
     {
         $uriSign = "POST:/banking/corporates/transfers";
 
-        $isoTime = self::generateIsoTime();
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
 
         $headers = array();
         $headers['Accept'] = 'application/json';
@@ -456,7 +455,7 @@ class BcaHttp
         // Harus disort agar mudah kalkulasi HMAC
         ksort($bodyData);
 
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, $bodyData);
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, $bodyData);
 
         $headers['X-BCA-Signature'] = $authSignature;
 
@@ -479,8 +478,8 @@ class BcaHttp
     public function getDepositRate($oauth_token)
     {
         $uriSign = "GET:/general/rate/deposit";
-        $isoTime = self::generateIsoTime();
-        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
+        $isoTime = BcaHelper::generateIsoTime(self::getTimeZone());
+        $authSignature = BcaHelper::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
 
         $headers = array();
         $headers['Accept'] = 'application/json';
@@ -503,31 +502,6 @@ class BcaHttp
     }
 
     /**
-     * Generate Signature.
-     *
-     * @param string $url Url yang akan disign.
-     * @param string $auth_token string nilai token dari login.
-     * @param string $secret_key string secretkey yang telah diberikan oleh BCA.
-     * @param string $isoTime string Waktu ISO8601.
-     * @param array|mixed $bodyToHash array Body yang akan dikirimkan ke Server BCA.
-     *
-     * @return string
-     */
-    public static function generateSign($url, $auth_token, $secret_key, $isoTime, $bodyToHash = [])
-    {
-        $hash = hash("sha256", "");
-        if (is_array($bodyToHash)) {
-            ksort($bodyToHash);
-            $encoderData = json_encode($bodyToHash, JSON_UNESCAPED_SLASHES);
-            $hash = hash("sha256", $encoderData);
-        }
-        $stringToSign = $url . ":" . $auth_token . ":" . $hash . ":" . $isoTime;
-        $auth_signature = hash_hmac('sha256', $stringToSign, $secret_key, false);
-
-        return $auth_signature;
-    }
-
-    /**
      * Set TimeZone.
      *
      * @param string $timeZone Time yang akan dipergunakan.
@@ -537,6 +511,7 @@ class BcaHttp
     public static function setTimeZone($timeZone)
     {
         self::$timezone = $timeZone;
+        return self::$timezone;
     }
 
     /**
@@ -559,6 +534,7 @@ class BcaHttp
     public static function setHostName($hostName)
     {
         self::$hostName = $hostName;
+        return self::$hostName;
     }
 
     /**
@@ -599,8 +575,9 @@ class BcaHttp
      */
     public static function setCurlOptions(array $curlOpts = [])
     {
-        $data = self::mergeCurlOptions(self::$curlOptions, $curlOpts);
+        $data = BcaHelper::mergeCurlOptions(self::$curlOptions, $curlOpts);
         self::$curlOptions = $data;
+        return self::$curlOptions;
     }
 
     /**
@@ -626,6 +603,7 @@ class BcaHttp
     public static function setPort($port)
     {
         self::$port = $port;
+        return self::$port;
     }
 
     /**
@@ -648,6 +626,7 @@ class BcaHttp
     public static function setScheme($scheme)
     {
         self::$scheme = $scheme;
+        return self::$scheme;
     }
 
     /**
@@ -658,90 +637,5 @@ class BcaHttp
     public static function getScheme()
     {
         return self::$scheme;
-    }
-
-    /**
-     * Generate ISO8601 Time.
-     *
-     * @param string $timeZone Time yang akan dipergunakan
-     *
-     * @return string
-     */
-    public static function generateIsoTime()
-    {
-        $date = Carbon::now(self::getTimeZone());
-        date_default_timezone_set(self::getTimeZone());
-        $fmt = $date->format('Y-m-d\TH:i:s');
-        $ISO8601 = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
-
-        return $ISO8601;
-    }
-
-    /**
-     * Merge from existing array.
-     *
-     * @param array $existing_options
-     * @param array $new_options
-     * @return array
-     */
-    private static function mergeCurlOptions(&$existing_options, $new_options)
-    {
-        $existing_options = $new_options + $existing_options;
-        return $existing_options;
-    }
-
-    /**
-     * Validasi jika clientsecret telah di-definsikan.
-     *
-     * @param array $sourceAccountId
-     *
-     * @throws BcaHttpException Error jika array tidak memenuhi syarat
-     * @return bool
-     */
-    private function validateArray($sourceAccountId = [])
-    {
-        if (!is_array($sourceAccountId)) {
-            throw new BcaHttpException('Data harus array.');
-        }
-        if (empty($sourceAccountId)) {
-            throw new BcaHttpException('AccountNumber tidak boleh kosong.');
-        } else {
-            $max = sizeof($sourceAccountId);
-            if ($max > 20) {
-                throw new BcaHttpException('Maksimal Account Number ' . 20);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Implode an array with the key and value pair giving
-     * a glue, a separator between pairs and the array
-     * to implode.
-     *
-     * @param string $glue The glue between key and value
-     * @param string $separator Separator between pairs
-     * @param array $array The array to implode
-     *
-     * @throws BcaHttpException error
-     * @return string The imploded array
-     */
-    public static function arrayImplode($glue, $separator, $array = [])
-    {
-        if (!is_array($array)) {
-            throw new BcaHttpException('Data harus array.');
-        }
-        if (empty($array)) {
-            throw new BcaHttpException('parameter array tidak boleh kosong.');
-        }
-        foreach ($array as $key => $val) {
-            if (is_array($val)) {
-                $val = implode(',', $val);
-            }
-            $string[] = "{$key}{$glue}{$val}";
-        }
-
-        return implode($separator, $string);
     }
 }

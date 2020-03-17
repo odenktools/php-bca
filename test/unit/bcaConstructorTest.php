@@ -3,7 +3,7 @@
 if (!class_exists('PHPUnit_Framework_TestCase') && class_exists('\PHPUnit\Framework\TestCase'))
     class_alias('\PHPUnit\Framework\TestCase', 'PHPUnit_Framework_TestCase');
 
-class bcaConstructorTest extends PHPUnit_Framework_TestCase
+class BcaTests extends PHPUnit_Framework_TestCase
 {
     protected function setUp()
     {
@@ -29,7 +29,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $params = array();
         $params['SearchBy'] = 'Distance';
         $params['Latitude'] = '123991239';
-        $query = \Bca\BcaHttp::arrayImplode('=', '&', $params);
+        $query = \Bca\BcaHelper::arrayImplode('=', '&', $params);
         $equal = 'SearchBy=Distance&Latitude=123991239';
         $this->assertEquals($equal, $query);
     }
@@ -39,7 +39,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $params = array();
         $params['SearchBy'] = array('Distance' => 'Hellooooo');
         $params['Latitude'] = '123991239';
-        $query = \Bca\BcaHttp::arrayImplode('=', '&', $params);
+        $query = \Bca\BcaHelper::arrayImplode('=', '&', $params);
         $equal = 'SearchBy=Hellooooo&Latitude=123991239';
         $this->assertEquals($equal, $query);
     }
@@ -49,7 +49,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
      */
     public function testArrayImplode3()
     {
-        $query = \Bca\BcaHttp::arrayImplode('=', '&', 'q');
+        $query = \Bca\BcaHelper::arrayImplode('=', '&', 'q');
         $this->assertEquals('Data harus array.', $query);
     }
 
@@ -60,58 +60,8 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
      */
     public function testArrayImplode4()
     {
-        $query = \Bca\BcaHttp::arrayImplode('=', '&', array());
+        $query = \Bca\BcaHelper::arrayImplode('=', '&', array());
         $this->assertEquals('parameter array tidak boleh kosong.', $query);
-    }
-
-    /**
-     * Test fail jika nomor akun kosong.
-     *
-     * @expectedException \Bca\BcaHttpException
-     */
-    public function testValidateArr()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $arr = array();
-        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
-        $this->assertTrue($settings);
-    }
-
-    /**
-     * Test fail nomor akun lebih dari 20.
-     *
-     * @expectedException \Bca\BcaHttpException
-     */
-    public function testValidateArr2()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $arr = array('001', '002', '003', '004', '005', '006', '007', '008', '009', '010', '011', '012', '013', '014', '015', '016', '017', '018', '019', '020', '021', '022');
-        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
-        $this->assertTrue($settings);
-    }
-
-    /**
-     * Testing validasi option ARRAY.
-     */
-    public function testValidateArr3()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $arr = array('001');
-        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
-        $this->assertTrue($settings);
-    }
-
-    /**
-     * Test fail jika array adalah string.
-     *
-     * @expectedException \Bca\BcaHttpException
-     */
-    public function testValidateArr4()
-    {
-        $bca = $this->getMockForAbstractClass('\Bca\BcaHttp', array('corp_id', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123', '1234567-1234-1234-1345-123456789123'));
-        $arr = '';
-        $settings = self::invokeMethod($bca, 'validateArray', array($arr));
-        $this->assertTrue($settings);
     }
 
     public function testCurlOptionsCanBeSet()
@@ -369,7 +319,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $arraySplit = implode(",", $arrayAccNumber);
         $uriSign = "GET:/banking/v2/corporates/corpid/accounts/$arraySplit";
         $isoTime = "2017-09-30T22:03:35.800+07:00";
-        $authSignature = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, null);
+        $authSignature = \Bca\BcaHelper::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, null);
 
         $output = "761eaec0e544c9cf5010b406ade39228ab182401e57f17fc54b9daa5ad99d0d6";
 
@@ -399,7 +349,7 @@ class bcaConstructorTest extends PHPUnit_Framework_TestCase
         $bodyData['TransactionDate'] = $isoTime;
         $bodyData['TransactionID'] = strtolower(str_replace(' ', '', "0020292"));
 
-        $authSignature = \Bca\BcaHttp::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, $bodyData);
+        $authSignature = \Bca\BcaHelper::generateSign($uriSign, $token, "9db65b91-01ff-46ec-9274-3f234b677450", $isoTime, $bodyData);
 
         $output = "1878f0eedcd93ff53054c8fc9ea271a29c99ea2f752f636c1cc765948009a90b";
 

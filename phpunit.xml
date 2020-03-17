@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="false"
+<phpunit bootstrap="./test/test_bootstrap.php"
+         backupGlobals="false"
          backupStaticAttributes="false"
          beStrictAboutTestsThatDoNotTestAnything="false"
          beStrictAboutOutputDuringTests="true"
-         bootstrap="./test/test_includes.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -14,32 +14,28 @@
          stopOnError="false"
          stopOnFailure="false"
          verbose="true">
-  <testsuites>
 
-    <testsuite name="all">
-      <directory>./test/</directory>
-    </testsuite>
+    <testsuites>
+        <testsuite name="Unit Test">
+            <directory>./test/unit/</directory>
+        </testsuite>
+    </testsuites>
 
-    <testsuite name="unit">
-      <directory>./test/unit/</directory>
-    </testsuite>
-  </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">lib/Bca</directory>
+            <exclude>
+                <file>lib/Bca/BcaHttpException.php</file>
+                <file>lib/Bca/BcaHttpInstance.php</file>
+            </exclude>
+        </whitelist>
+    </filter>
 
-  <filter>
-    <whitelist>
-      <directory suffix=".php">lib/Bca</directory>
-        <exclude>
-            <file>lib/Bca/BcaHttpException.php</file>
-            <file>lib/Bca/BcaHttpInstance.php</file>
-      </exclude>
-    </whitelist>
-  </filter>
-
-  <logging>
-    <log type="junit" target="build/report.junit.xml"/>
-    <log type="coverage-html" target="build/coverage"/>
-    <log type="coverage-text" target="build/coverage.txt"/>
-    <log type="coverage-clover" target="build/logs/clover.xml"/>
-  </logging>
+    <logging>
+        <log type="junit" target="build/report.junit.xml"/>
+        <log type="coverage-html" target="build/coverage"/>
+        <log type="coverage-text" target="build/coverage.txt"/>
+        <log type="coverage-clover" target="build/logs/clover.xml"/>
+    </logging>
 
 </phpunit>
