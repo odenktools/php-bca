@@ -1,6 +1,6 @@
+dist: trusty
 language: php
 sudo: false
-dist: bionic
 
 matrix:
   include:
@@ -39,7 +39,6 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
-  - phpenv config-rm xdebug.ini || true
   - curl --version
   - travis_retry composer self-update
   - if [[ "$TRAVIS_PHP_VERSION" != "7.0" || "$TRAVIS_PHP_VERSION" != "7.1" ]]; then echo "xdebug.overload_var_dump = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini || true; fi
