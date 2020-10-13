@@ -1,3 +1,23 @@
+Version 2.3.2:
+ - update carbon compability
+ - Fixing bug pada account statement dan menambahkan default currency pada method fundTransfer
+ - Add custom curl options
+ - * backward compatibility with old settings * Create curlOpts
+ - * Refactor default settings * backward compatibility with old settings
+ - remove deprecated tap listener
+ - fixing Undefined variable: transactionID
+ - * Fixing authSignature
+ - remove
+ - * Menambahkan test testGenerateSign2 memastikan agar output signature sama. * Rubah README.md fix PHP 7.2. * PHP 7.2 tidak boleh failure saat dilakukan testing. * Menambahkan PHP 7.3 testing pada travis-ci.
+ - - Compatible dengan PHP 7.2 - Hapus charset="UTF-8" yui="true" highlight="true" pada phpunit.xml
+ - Fixing PHPUnit_Framework_TestCase #1
+ - try to fixing unitest > php7
+ - Update .travis.yml
+ - Merge pull request #15 from odenktools/revert-14-feature/domestic-transfer
+ - Revert "Penambahan fitur transfer antar bank"
+ - Merge pull request #14 from tarikhagustia/feature/domestic-transfer
+ - Penambahan fitur transfer antar bank
+
 Version 2.2.1:
  - * strip all body to lowercase * strip all body whitespace * modified documentation
  - Merge pull request #12 from odenktools/odenktools-patch-1
