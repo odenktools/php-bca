@@ -151,8 +151,8 @@ class BcaHttp
             $this->settings['timezone'] = $options['timezone'];
             $this->settings['options']['timezone'] = $options['timezone'];
         } else {
-            $this->settings['timezone'] = self::getHostName();
-            $this->settings['options']['timezone'] = self::getHostName();
+            $this->settings['timezone'] = self::getTimeZone();
+            $this->settings['options']['timezone'] = self::getTimeZone();
         }
 
         // Setup optional timeout, if timeout is empty
