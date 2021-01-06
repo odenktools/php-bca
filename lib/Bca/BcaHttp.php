@@ -11,11 +11,11 @@ use Unirest\Request\Body;
  *
  * @author     Pribumi Technology
  * @license    MIT
- * @copyright  (c) 2017, Pribumi Technology
+ * @copyright  (c) 2017-2021, Pribumi Technology
  */
 class BcaHttp
 {
-    public static $VERSION = '2.3.1';
+    public static $VERSION = '2.3.3';
 
     /**
      * Default Timezone.
@@ -151,8 +151,8 @@ class BcaHttp
             $this->settings['timezone'] = $options['timezone'];
             $this->settings['options']['timezone'] = $options['timezone'];
         } else {
-            $this->settings['timezone'] = self::getHostName();
-            $this->settings['options']['timezone'] = self::getHostName();
+            $this->settings['timezone'] = self::getTimeZone();
+            $this->settings['options']['timezone'] = self::getTimeZone();
         }
 
         // Setup optional timeout, if timeout is empty
@@ -273,26 +273,22 @@ class BcaHttp
      * @param string $sourceAccount nomor akun yang akan dicek
      * @param string $startDate tanggal awal
      * @param string $endDate tanggal akhir
-     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA
      *
      * @return \Unirest\Response
      */
     public function getAccountStatement($oauth_token, $sourceAccount, $startDate, $endDate)
     {
         $corp_id = $this->settings['corp_id'];
-
         $uriSign = "GET:/banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $isoTime = self::generateIsoTime();
         $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, null);
-
         $headers = array();
         $headers['Accept'] = 'application/json';
         $headers['Content-Type'] = 'application/json';
         $headers['Authorization'] = "Bearer $oauth_token";
-        $headers['X-BCA-Key'] = $this->settings['secret_key'];
+        $headers['X-BCA-Key'] = $this->settings['api_key'];
         $headers['X-BCA-Timestamp'] = $isoTime;
         $headers['X-BCA-Signature'] = $authSignature;
-
         $request_path = "banking/v3/corporates/$corp_id/accounts/$sourceAccount/statements?EndDate=$endDate&StartDate=$startDate";
         $domain = $this->ddnDomain();
         $full_url = $domain . $request_path;
@@ -300,7 +296,6 @@ class BcaHttp
         $data = array('grant_type' => 'client_credentials');
         $body = Body::form($data);
         $response = Request::get($full_url, $headers, $body);
-
         return $response;
     }
 
@@ -353,6 +348,96 @@ class BcaHttp
         $data = array('grant_type' => 'client_credentials');
         $body = Body::form($data);
         $response = Request::get($full_url, $headers, $body);
+
+        return $response;
+    }
+
+    /**
+     * Transfer dana kepada akun yang berbeda bank dengan jumlah nominal tertentu.
+     *
+     * @param string $oauth_token nilai token yang telah didapatkan setelah login.
+     * @param string $channelId Unknown description.
+     * @param int $amount nilai dana dalam RUPIAH yang akan ditransfer, Format: 13.2
+     * @param string $sourceAccountNumber Source of Fund Account Number
+     * @param string $beneficiaryAccountNumber BCA Account number to be credited (Destination)
+     * @param string $beneficiaryBankCode Kode Bank to be credited (Destination)
+     * @param string $beneficiaryCustResidence 1 = Resident 2 = Non Resident *mandatory, if transfer_type = LLG/RTG
+     * @param string $beneficiaryCustType 1 = Personal 2 = Corporate 3 = Government *mandatory, if transfer_type = LLG/RTG
+     * @param string $beneficiaryName Nama penerima.
+     * @param string $beneficiaryEmail Email penerima.
+     * @param string $transactionID Transcation ID unique per day (using UTC+07 Time Zone). Format: Number
+     * @param string $transactionType ONL (Switching) ; LLG; RTG (RTGS)
+     * @param string $remark1 Transfer remark for receiver
+     * @param string $remark2 ransfer remark for receiver
+     * @param string $currencyCode nilai MATA Uang [Optional]
+     *
+     * @return \Unirest\Response
+     */
+    public function fundTransfersDomestic(
+        $oauth_token,
+        $channelId,
+        $amount,
+        $sourceAccountNumber,
+        $beneficiaryAccountNumber,
+        $beneficiaryBankCode,
+        $beneficiaryCustResidence,
+        $beneficiaryCustType,
+        $beneficiaryName,
+        $beneficiaryEmail,
+        $transactionID,
+        $transactionType,
+        $remark1,
+        $remark2,
+        $currencyCode = 'IDR'
+    )
+    {
+        $uriSign = "POST:/banking/corporates/transfers/v2/domestic";
+        $isoTime = self::generateIsoTime();
+        $headers = array();
+        $headers['Accept'] = 'application/json';
+        $headers['Content-Type'] = 'application/json';
+        $headers['Authorization'] = "Bearer $oauth_token";
+        $headers['X-BCA-Key'] = $this->settings['api_key'];
+        $headers['X-BCA-Timestamp'] = $isoTime;
+        $headers['channel-id'] = $channelId;
+        $headers['credential-id'] = $this->settings['corp_id'];
+
+        $request_path = "banking/corporates/transfers/v2/domestic";
+        $domain = $this->ddnDomain();
+        $full_url = $domain . $request_path;
+
+        $bodyData = array();
+        $bodyData['amount'] = $amount;
+        $bodyData['beneficiary_account_number'] = strtolower(str_replace(' ', '', $beneficiaryAccountNumber));
+        $bodyData['beneficiary_bank_code'] = strtolower(str_replace(' ', '', $beneficiaryBankCode));
+        $bodyData['beneficiary_cust_residence'] = $beneficiaryCustResidence;
+        $bodyData['beneficiary_cust_type'] = $beneficiaryCustType;
+        $bodyData['beneficiary_name'] = strtolower(str_replace(' ', '', $beneficiaryName));
+        if (empty($beneficiaryEmail) || $beneficiaryEmail === '') {
+            $bodyData['beneficiary_email'] = '';
+        } else {
+            $bodyData['beneficiary_email'] = strtolower(str_replace(' ', '', $beneficiaryEmail));
+        }
+        $bodyData['currency_code'] = $currencyCode;
+        $bodyData['remark1'] = !empty($remark1) ? strtolower(str_replace(' ', '', $remark1)) : "";
+        $bodyData['remark1'] = !empty($remark2) ? strtolower(str_replace(' ', '', $remark2)) : "";
+        $bodyData['source_account_number'] = strtolower(str_replace(' ', '', $sourceAccountNumber));
+        $bodyData['transaction_date'] = self::generateDateTransaction();
+        $bodyData['transaction_id'] = strtolower(str_replace(' ', '', $transactionID));
+        $bodyData['transfer_type'] = strtoupper(str_replace(' ', '', $transactionType));
+
+        // Harus disort agar mudah kalkulasi HMAC
+        ksort($bodyData);
+
+        $authSignature = self::generateSign($uriSign, $oauth_token, $this->settings['secret_key'], $isoTime, $bodyData);
+
+        $headers['X-BCA-Signature'] = $authSignature;
+
+        // Supaya jgn strip "ReferenceID" "/" jadi "/\" karena HMAC akan menjadi tidak cocok
+        $encoderData = json_encode($bodyData, JSON_UNESCAPED_SLASHES);
+
+        $body = Body::form($encoderData);
+        $response = Request::post($full_url, $headers, $body);
 
         return $response;
     }
@@ -414,7 +499,7 @@ class BcaHttp
      * @param string $remark2 ransfer remark for receiver
      * @param string $sourceAccountNumber Source of Fund Account Number
      * @param string $transactionID Transcation ID unique per day (using UTC+07 Time Zone). Format: Number
-     * @param string $corp_id nilai CorporateID yang telah diberikan oleh pihak BCA [Optional]
+     * @param string $currencyCode nilai MATA Uang [Optional]
      *
      * @return \Unirest\Response
      */
@@ -426,7 +511,8 @@ class BcaHttp
         $referenceID,
         $remark1,
         $remark2,
-        $transactionID
+        $transactionID,
+        $currencyCode = 'idr'
     )
     {
         $uriSign = "POST:/banking/corporates/transfers";
@@ -448,7 +534,7 @@ class BcaHttp
         $bodyData['Amount'] = $amount;
         $bodyData['BeneficiaryAccountNumber'] = strtolower(str_replace(' ', '', $beneficiaryAccountNumber));
         $bodyData['CorporateID'] = strtolower(str_replace(' ', '', $this->settings['corp_id']));
-        $bodyData['CurrencyCode'] = 'idr';
+        $bodyData['CurrencyCode'] = $currencyCode;
         $bodyData['ReferenceID'] = strtolower(str_replace(' ', '', $referenceID));
         $bodyData['Remark1'] = strtolower(str_replace(' ', '', $remark1));
         $bodyData['Remark2'] = strtolower(str_replace(' ', '', $remark2));
@@ -540,6 +626,7 @@ class BcaHttp
     public static function setTimeZone($timeZone)
     {
         self::$timezone = $timeZone;
+        return self::$timezone;
     }
 
     /**
@@ -562,6 +649,8 @@ class BcaHttp
     public static function setHostName($hostName)
     {
         self::$hostName = $hostName;
+
+        return self::$hostName;
     }
 
     /**
@@ -604,6 +693,9 @@ class BcaHttp
     {
         $data = self::mergeCurlOptions(self::$curlOptions, $curlOpts);
         self::$curlOptions = $data;
+
+        // return.
+        return self::$curlOptions;
     }
 
     /**
@@ -616,6 +708,8 @@ class BcaHttp
     public static function setTimeOut($timeOut)
     {
         self::$timeOut = $timeOut;
+
+        // return.
         return self::$timeOut;
     }
 
@@ -629,6 +723,9 @@ class BcaHttp
     public static function setPort($port)
     {
         self::$port = $port;
+
+        // return.
+        return self::$port;
     }
 
     /**
@@ -651,6 +748,9 @@ class BcaHttp
     public static function setScheme($scheme)
     {
         self::$scheme = $scheme;
+
+        // return.
+        return self::$scheme;
     }
 
     /**
@@ -666,8 +766,6 @@ class BcaHttp
     /**
      * Generate ISO8601 Time.
      *
-     * @param string $timeZone Time yang akan dipergunakan
-     *
      * @return string
      */
     public static function generateIsoTime()
@@ -678,6 +776,20 @@ class BcaHttp
         $ISO8601 = sprintf("$fmt.%s%s", substr(microtime(), 2, 3), date('P'));
 
         return $ISO8601;
+    }
+
+    /**
+     * Generate ISO8601 Time.
+     *
+     * @return string
+     */
+    public static function generateDateTransaction()
+    {
+        $date = Carbon::now(self::getTimeZone());
+        date_default_timezone_set(self::getTimeZone());
+        $fmt = $date->format('Y-m-d');
+
+        return $fmt;
     }
 
     /**

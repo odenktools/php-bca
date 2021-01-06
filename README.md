@@ -203,7 +203,7 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
     echo json_encode($response);
 ```
 
-### FUND TRANSFER
+### FUND TRANSFER (UPDATED)
 
 Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berlaku (Tidak Expired).
 
@@ -229,6 +229,9 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
 
     $remark2 = 'Online Transfer Using Odenktools BCA';
 
+    // value hanya support idr dan usd
+    $mataUang = 'idr';
+
     $response = $bca->fundTransfers($token, 
                         $amount,
                         $nomorakun,
@@ -236,7 +239,8 @@ Pastikan anda mendapatkan nilai ```TOKEN``` dan ```TOKEN``` tersebut masih berla
                         $nomorPO,
                         $remark1,
                         $remark2,
-                        $nomorTransaksiID);
+                        $nomorTransaksiID,
+                        $mataUang);
 
     // Cek hasil response berhasil atau tidak
     echo json_encode($response);
